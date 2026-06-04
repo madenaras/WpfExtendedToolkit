@@ -42,6 +42,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     private const string PART_VerticalScrollBar = "PART_VerticalScrollBar";
     private const string PART_HorizontalScrollBar = "PART_HorizontalScrollBar";
     private bool _isUpdatingVisualTree = false;
+    private bool _isUsingDefaultViewFinder = false;
 
     #region Constructors
 
@@ -58,9 +59,14 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     public Zoombox()
       : base()
     {
+
+      Core.Message.ShowMessage();
+
       try
       {
+#if !NETCORE && !NET5
         new UIPermission( PermissionState.Unrestricted ).Demand();
+#endif
         _cacheBits[ ( int )CacheBits.HasUIPermission ] = true;
       }
       catch( SecurityException )
@@ -893,6 +899,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     private void OnViewFinderChanged( DependencyPropertyChangedEventArgs e )
     {
       this.AttachToVisualTree();
+      _isUsingDefaultViewFinder = false;
     }
 
     #endregion
@@ -1877,6 +1884,9 @@ namespace Xceed.Wpf.Toolkit.Zoombox
     {
       this.AttachToVisualTree();
       base.OnApplyTemplate();
+
+      this.SetCurrentView( ZoomboxView.Empty );
+      this.GoHome();
     }
 
     public void RefocusView()
@@ -2140,12 +2150,13 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       // If we don't do the following, the content is not laid out correctly (centered) initially.
       VisualTreeHelperEx.FindDescendantWithPropertyValue( this, Button.IsPressedProperty, true );
 
-      // User has not defined a ViewFinder, use the one from this template
-      if( this.GetValue( Zoombox.ViewFinderPropertyKey.DependencyProperty ) == null )
+      // User has not defined a ViewFinder(or is using the one from this template), use the one from this template
+      if( ( this.GetValue( Zoombox.ViewFinderPropertyKey.DependencyProperty ) == null ) || _isUsingDefaultViewFinder )
       {
         // set a reference to the ViewFinder element, if present
         this.SetValue( Zoombox.ViewFinderPropertyKey, this.Template.FindName( "ViewFinder", this ) as FrameworkElement );
         Zoombox.SetViewFinderVisibility( this, Visibility.Collapsed );
+        _isUsingDefaultViewFinder = true;
       }
       else
       {
@@ -2283,13 +2294,17 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       }
       //When ViewFinder is modified, this will refresh the ZoomboxViewFinderDisplay
       this.ZoomTo( this.Scale );
+
+      UpdateViewFinderDisplayContentBounds();
     }
 
     private void DetachFromVisualTree()
     {
       // remove the drag adorner
-      if( (_dragAdorner != null) && ( AdornerLayer.GetAdornerLayer( this ) != null ) )
+      if( ( _dragAdorner != null ) && ( AdornerLayer.GetAdornerLayer( this ) != null ) )
         AdornerLayer.GetAdornerLayer( this ).Remove( _dragAdorner );
+
+      this.InputBindings.Clear();
 
       // remove the layout updated handler, if present
       if( _contentPresenter != null )

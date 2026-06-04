@@ -190,6 +190,8 @@ namespace Xceed.Wpf.Toolkit
 
     public PrimitiveTypeCollectionControl()
     {
+
+      Core.Message.ShowMessage();
     }
 
     #endregion //Constructors

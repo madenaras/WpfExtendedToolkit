@@ -25,6 +25,16 @@
                     Focusable="False" />
   </DataTemplate>
 
+  <LinearGradientBrush x:Key="DefaultWatermarkBackground"
+                       EndPoint="0,1"
+                       StartPoint="0,0">
+    <GradientStop Color="#FFF0F0F0"
+                  Offset="0" />
+    <GradientStop Color="#FFE5E5E5"
+                  Offset="1" />
+  </LinearGradientBrush>
+
+
   <!-- =============================================================================== -->
   <!-- WatermarkTextBox Template                                                       -->
   <!-- =============================================================================== -->
@@ -94,23 +104,15 @@
                   <Border x:Name="templateRoot"
                           BorderBrush="{TemplateBinding BorderBrush}"
                           BorderThickness="{TemplateBinding BorderThickness}"
-                          SnapsToDevicePixels="True">
-                    <Border.Background>
-                      <LinearGradientBrush EndPoint="0,1"
-                                           StartPoint="0,0">
-                        <GradientStop Color="#FFF0F0F0"
-                                      Offset="0" />
-                        <GradientStop Color="#FFE5E5E5"
-                                      Offset="1" />
-                      </LinearGradientBrush>
-                    </Border.Background>
+                          SnapsToDevicePixels="True"
+                          Background="{Binding WatermarkBackground, RelativeSource={RelativeSource AncestorType={x:Type local:WatermarkComboBox}}, TargetNullValue={StaticResource DefaultWatermarkBackground}}">
                     <Border x:Name="splitBorder"
                             BorderBrush="Transparent"
                             BorderThickness="1"
                             HorizontalAlignment="Right"
                             Margin="0"
                             SnapsToDevicePixels="True"
-                            Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}">
+                            Width="17">
                       <Path x:Name="Arrow"
                             Data="F1M0,0L2.667,2.66665 5.3334,0 5.3334,-1.78168 2.6667,0.88501 0,-1.78168 0,0z"
                             Fill="#FF606060"
@@ -315,7 +317,7 @@
                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
       <Border x:Name="Border"
-              Background="White"
+              Background="{Binding WatermarkBackground, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={StaticResource DefaultWatermarkBackground}}"
               Margin="{TemplateBinding BorderThickness}"
               Visibility="Collapsed">
         <TextBox x:Name="PART_EditableTextBox"

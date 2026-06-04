@@ -85,7 +85,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       this.RaiseContainerHelperInvalidated();
     }
 
-    protected override BindingBase CreateValueBinding()
+    protected override void CreateValueBinding()
     {
       var selectedObject = this.SelectedObject;
       var propertyName = this.PropertyDescriptor.Name;
@@ -97,10 +97,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         Mode = PropertyDescriptor.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay,
         ValidatesOnDataErrors = true,
         ValidatesOnExceptions = true,
-        ConverterCulture = CultureInfo.CurrentCulture 
+        ConverterCulture = CultureInfo.CurrentCulture
       };
 
-      return binding;
+      BindingOperations.SetBinding( this, DescriptorPropertyDefinitionBase.ValueProperty, binding );
     }
 
     protected override bool ComputeIsReadOnly()
@@ -118,7 +118,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       if( !PropertyDescriptor.IsReadOnly )
       {
         var defaultValue = this.ComputeDefaultValueAttribute();
-        if( defaultValue != null)
+        if( defaultValue != null )
           return !defaultValue.Equals( this.Value ); // can Reset if different from defaultValue.
 
         return PropertyDescriptor.CanResetValue( SelectedObject );
@@ -206,7 +206,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
               var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault( a => a.FullName.Contains( typeDef[ 1 ].Trim() ) );
               if( assembly != null )
               {
-                type = assembly.GetTypes().FirstOrDefault( t => (t != null) && (t.FullName != null) && t.FullName.Contains( typeDef[ 0 ] ) );
+                type = assembly.GetTypes().FirstOrDefault( t => ( t != null ) && ( t.FullName != null ) && t.FullName.Contains( typeDef[ 0 ] ) );
               }
             }
           }
@@ -235,6 +235,10 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       var itemsSourceAttribute = GetAttribute<ItemsSourceAttribute>();
       if( itemsSourceAttribute != null )
         return new ItemsSourceAttributeEditor( itemsSourceAttribute );
+
+      var passwordPropertyTextAttribute = GetAttribute<PasswordPropertyTextAttribute>();
+      if( passwordPropertyTextAttribute != null )
+        return new PasswordEditor();
 
       return null;
     }

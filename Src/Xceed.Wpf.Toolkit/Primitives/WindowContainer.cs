@@ -220,14 +220,14 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     private void Child_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
     {
-      WindowControl windowControl = ( WindowControl )sender;
-
-      //Do not give access to data behind the WindowContainer as long as any child of WindowContainer is visible.
-      WindowControl firstVisibleChild = this.Children.OfType<WindowControl>().FirstOrDefault( ( x ) => x.Visibility == Visibility.Visible );
+      // Do not give access to data behind the WindowContainer as long as any child of WindowContainer is visible.
+      var firstVisibleChild = this.Children.OfType<WindowControl>().FirstOrDefault( ( x ) => x.Visibility == Visibility.Visible );
       this.IsHitTestVisible = ( firstVisibleChild != null );
 
       if( ( bool )e.NewValue )
       {
+        var windowControl = ( WindowControl )sender;
+
         this.SetChildPos( windowControl );
         this.SetNextActiveWindow( windowControl );
       }
@@ -236,10 +236,15 @@ namespace Xceed.Wpf.Toolkit.Primitives
         this.SetNextActiveWindow( null );
       }
 
-      WindowControl modalWindow = this.GetModalWindow();
-      foreach( WindowControl window in this.Children )
+      var modalWindow = this.GetModalWindow();
+      if( modalWindow != null )
       {
-        window.IsBlockMouseInputsPanelActive = ( modalWindow != null ) && !object.Equals( modalWindow, window );
+        // Children can be null.
+        var windowControls = this.Children.OfType<WindowControl>();
+        foreach( var window in windowControls )
+        {
+          window.IsBlockMouseInputsPanelActive = !object.Equals( modalWindow, window );
+        }
       }
 
       this.SetModalBackground();

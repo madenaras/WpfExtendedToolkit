@@ -327,6 +327,8 @@ namespace Xceed.Wpf.Toolkit
 
     public ColorCanvas()
     {
+
+      Core.Message.ShowMessage();
     }
 
     #endregion //Constructors

@@ -16,28 +16,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Windows.Controls;
-using System.Windows;
-using System.Windows.Data;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Windows.Input;
 using System.Diagnostics;
-using System.Windows.Documents;
 using System.Globalization;
-using System.Windows.Controls.Primitives;
 using System.Reflection;
-
-using System.Collections;
 using System.Security;
 using System.Security.Permissions;
-using System.Windows.Automation;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit
 {
-  public class MaskedTextBox : ValueRangeTextBox
+  public class MaskedTextBox : ValueRangeTextBox , INotifyPropertyChanged
   {
     #region STATIC MEMBERS
 
@@ -164,7 +158,10 @@ namespace Xceed.Wpf.Toolkit
 
     static MaskedTextBox()
     {
-      MaskedTextBox.TextProperty.OverrideMetadata( typeof( MaskedTextBox ),
+      DefaultStyleKeyProperty.OverrideMetadata( typeof( MaskedTextBox ),
+        new FrameworkPropertyMetadata( typeof( MaskedTextBox ) ) );
+
+        MaskedTextBox.TextProperty.OverrideMetadata( typeof( MaskedTextBox ),
         new FrameworkPropertyMetadata(
         null,
         new CoerceValueCallback( MaskedTextBox.TextCoerceValueCallback ) ) );
@@ -172,6 +169,9 @@ namespace Xceed.Wpf.Toolkit
 
     public MaskedTextBox()
     {
+
+      Core.Message.ShowMessage();
+
       CommandManager.AddPreviewCanExecuteHandler( this, new CanExecuteRoutedEventHandler( this.OnPreviewCanExecuteCommands ) );
       CommandManager.AddPreviewExecutedHandler( this, new ExecutedRoutedEventHandler( this.OnPreviewExecutedCommands ) );
 
@@ -928,11 +928,55 @@ namespace Xceed.Wpf.Toolkit
         this.SetIsMaskFull( m_maskedTextProvider.MaskFull );
       }
 
+      this.RaisePropertyChange( "RawText" );
       base.OnTextChanged( e );
     }
 
     #endregion Text Property
 
+    #region RawText Property
+    public string RawText
+    {
+        get 
+        {
+             return this.GetRawText();
+        }
+    }
+    #endregion
+
+    #region Watermark
+
+        public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register( "Watermark", typeof( string ), typeof( MaskedTextBox ), new UIPropertyMetadata( null ) );
+        public string Watermark
+        {
+            get
+            {
+                return ( string ) GetValue( WatermarkProperty );
+            }
+            set
+            {
+                SetValue( WatermarkProperty, value );
+            }
+        }
+
+        #endregion //Watermark
+
+    #region WatermarkTemplate
+
+        public static readonly DependencyProperty WatermarkTemplateProperty = DependencyProperty.Register( "WatermarkTemplate", typeof( DataTemplate ), typeof(MaskedTextBox), new UIPropertyMetadata( null ) );
+        public DataTemplate WatermarkTemplate
+        {
+            get
+            {
+                return ( DataTemplate )GetValue( WatermarkTemplateProperty );
+            }
+            set
+            {
+                SetValue( WatermarkTemplateProperty, value);
+            }
+        }
+
+    #endregion //WatermarkBackground
 
     #region COMMANDS
 
@@ -1036,7 +1080,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !e.CanExecute ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        PlayBeep();
+      }
     }
 
     private void CanExecuteDeletePreviousWord( object sender, CanExecuteRoutedEventArgs e )
@@ -1066,7 +1112,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !e.CanExecute ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        this.PlayBeep();
+      }
     }
 
     private void CanExecuteDeleteNextWord( object sender, CanExecuteRoutedEventArgs e )
@@ -1096,7 +1144,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !e.CanExecute ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        this.PlayBeep();
+      }
     }
 
     private void CanExecuteBackspace( object sender, CanExecuteRoutedEventArgs e )
@@ -1108,7 +1158,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !e.CanExecute ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        this.PlayBeep();
+      }
     }
 
     private void CanExecuteCut( object sender, CanExecuteRoutedEventArgs e )
@@ -1131,7 +1183,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !canCut ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        this.PlayBeep();
+      }
     }
 
     private void CanExecutePaste( object sender, CanExecuteRoutedEventArgs e )
@@ -1165,7 +1219,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !e.CanExecute ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        this.PlayBeep();
+      }
     }
 
     private void CanExecuteCopy( object sender, CanExecuteRoutedEventArgs e )
@@ -1177,7 +1233,9 @@ namespace Xceed.Wpf.Toolkit
       e.Handled = true;
 
       if( ( !e.CanExecute ) && ( this.BeepOnError ) )
-        System.Media.SystemSounds.Beep.Play();
+      {
+        this.PlayBeep();
+      }
     }
 
     private void ExecuteCopy()
@@ -1185,7 +1243,9 @@ namespace Xceed.Wpf.Toolkit
       string selectedText = this.GetSelectedText();
       try
       {
+#if !NETCORE && !NET5
         new UIPermission( UIPermissionClipboard.AllClipboard ).Demand();
+#endif
 
         if( selectedText.Length == 0 )
         {
@@ -1392,7 +1452,9 @@ namespace Xceed.Wpf.Toolkit
         else
         {
           if( this.BeepOnError )
-            System.Media.SystemSounds.Beep.Play();
+          {
+            this.PlayBeep();
+          }
         }
 
         if( this.SelectionLength > 0 )
@@ -1613,6 +1675,13 @@ namespace Xceed.Wpf.Toolkit
 
     #region PRIVATE METHODS
 
+    private void PlayBeep()
+    {
+#pragma warning disable CA1416
+      System.Media.SystemSounds.Beep.Play();
+#pragma warning restore CA1416
+    }
+
     private bool PlaceChar( char ch, int startPosition, int length, bool overwrite, out int caretIndex )
     {
       return this.PlaceChar( m_maskedTextProvider, ch, startPosition, length, overwrite, out caretIndex );
@@ -1681,6 +1750,12 @@ namespace Xceed.Wpf.Toolkit
 
     public event EventHandler<AutoCompletingMaskEventArgs> AutoCompletingMask;
 
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public void RaisePropertyChange(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     private bool PlaceCharCore( MaskedTextProvider provider, char ch, int startPosition, int length, bool overwrite, out int caretPosition )
     {
@@ -1725,7 +1800,9 @@ namespace Xceed.Wpf.Toolkit
       else
       {
         if( this.BeepOnError )
-          System.Media.SystemSounds.Beep.Play();
+        {
+          this.PlayBeep();
+        }
       }
     }
 
@@ -1842,7 +1919,9 @@ namespace Xceed.Wpf.Toolkit
       if( !success )
       {
         if( this.BeepOnError )
-          System.Media.SystemSounds.Beep.Play();
+        {
+          this.PlayBeep();
+        }
 
         return;
       }
@@ -1909,7 +1988,7 @@ namespace Xceed.Wpf.Toolkit
     {
       //System.Diagnostics.Debug.Assert( provider.EditPositionCount > 0 );
 
-      bool includePrompt =  ( !this.HidePromptOnLeave || this.IsFocused );
+      bool includePrompt = ( !this.HidePromptOnLeave || this.IsFocused );
 
       string displayString = provider.ToString( false, includePrompt, true, 0, m_maskedTextProvider.Length );
 

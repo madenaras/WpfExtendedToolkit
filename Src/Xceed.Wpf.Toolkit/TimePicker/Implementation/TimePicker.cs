@@ -97,6 +97,35 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Format
 
+    #region TimeListItemsStyle
+
+    public static readonly DependencyProperty TimeListItemsStyleProperty = DependencyProperty.Register( "TimeListItemsStyle", typeof( Style ), typeof( TimePicker ),
+            new FrameworkPropertyMetadata( ( Style )null, new PropertyChangedCallback( OnTimeListItemsStyleChanged ) ) );
+
+    public Style TimeListItemsStyle
+    {
+      get
+      {
+        return ( Style )GetValue( TimeListItemsStyleProperty );
+      }
+      set
+      {
+        SetValue( TimeListItemsStyleProperty, value );
+      }
+    }
+
+    private static void OnTimeListItemsStyleChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      ( ( TimePicker )d ).OnTimeListItemsStyleChanged( e );
+    }
+
+    protected virtual void OnTimeListItemsStyleChanged( DependencyPropertyChangedEventArgs e )
+    {
+      // TODO: Add your property changed side-effects. Descendants can override as well.
+    }
+
+    #endregion
+
     #region MaxDropDownHeight
 
     public static readonly DependencyProperty MaxDropDownHeightProperty = DependencyProperty.Register( "MaxDropDownHeight", typeof( double ), typeof( TimePicker ), new UIPropertyMetadata( 130d, OnMaxDropDownHeightChanged ) );
@@ -461,7 +490,7 @@ namespace Xceed.Wpf.Toolkit
       TimeSpan timeInterval = TimeInterval;
       List<TimeItem> timeItemList = new List<TimeItem>();
 
-      if( time != null && endTime != null && timeInterval != null && timeInterval.Ticks > 0 )
+      if( timeInterval.Ticks > 0 )
       {
         while( time <= endTime )
         {

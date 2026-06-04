@@ -25,6 +25,8 @@ namespace Xceed.Wpf.Toolkit
   {
     public AutoSelectTextBox()
     {
+
+      Core.Message.ShowMessage();
     }
 
     #region AutoSelectBehavior PROPERTY

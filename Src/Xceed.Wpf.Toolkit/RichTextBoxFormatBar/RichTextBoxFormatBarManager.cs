@@ -167,13 +167,12 @@ namespace Xceed.Wpf.Toolkit
       _toolbar = formatBar;
     }
 
-    /// <summary>
-    /// Shows the FormatBar
-    /// </summary>
     void ShowAdorner()
     {
       if( _adorner.Visibility == Visibility.Visible )
-        return;
+      {
+        HideAdorner();
+      }
 
       VerifyAdornerLayer();
 

@@ -15,28 +15,15 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Media;
 
 namespace Xceed.Wpf.Toolkit.Core.Media
 {
-  /// <summary>
-  /// Contains system colors and configurations that can be used by the control themes.
-  /// 
-  /// Mainly extracted from the registry because theses values are not exposed by the standard .NET API.
-  /// </summary>
   public static class WindowColors
   {
     private static Color? _colorizationMode;
     private static bool? _colorizationOpaqueBlend;
 
-    /// <summary>
-    /// Relative to the \HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM\ColorizationColor Registry key.
-    /// 
-    /// Gets the window chrome color.
-    /// </summary>
     public static Color ColorizationColor
     {
       get
@@ -52,20 +39,13 @@ namespace Xceed.Wpf.Toolkit.Core.Media
         {
           // If for any reason (for example, a SecurityException for XBAP apps)
           // we cannot read the value in the registry, fall back on some color.
-          _colorizationMode = Color.FromArgb(255, 175, 175, 175);
+          _colorizationMode = Color.FromArgb( 255, 175, 175, 175 );
         }
 
         return _colorizationMode.Value;
       }
     }
 
-    /// <summary>
-    /// Relative to the \HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM\ColorizationOpaqueBlend Registry key:
-    /// 
-    /// Gets whether transparency is disabled.
-    /// 
-    /// Returns true if transparency is disabled; false otherwise.
-    /// </summary>
     public static bool ColorizationOpaqueBlend
     {
       get
@@ -90,6 +70,7 @@ namespace Xceed.Wpf.Toolkit.Core.Media
 
     private static int GetDWMIntValue( string keyName )
     {
+#pragma warning disable CA1416
       // This value is not accessible throught the standard WPF API.
       // We must dig into the registry to get the value.
       var curUser = Microsoft.Win32.Registry.CurrentUser;
@@ -99,22 +80,23 @@ namespace Xceed.Wpf.Toolkit.Core.Media
 #if VS2008
         );
 #else
-        ,Microsoft.Win32.RegistryOptions.None );
+        , Microsoft.Win32.RegistryOptions.None );
 #endif
       return ( int )subKey.GetValue( keyName );
+#pragma warning restore CA1416
     }
 
     private static Color GetDWMColorValue( string keyName )
     {
       int value = WindowColors.GetDWMIntValue( keyName );
-        byte[] bytes = BitConverter.GetBytes( value );
-        return new Color()
-        {
-          B = bytes[ 0 ],
-          G = bytes[ 1 ],
-          R = bytes[ 2 ],
-          A = 255
-        };
+      byte[] bytes = BitConverter.GetBytes( value );
+      return new Color()
+      {
+        B = bytes[ 0 ],
+        G = bytes[ 1 ],
+        R = bytes[ 2 ],
+        A = 255
+      };
     }
 
     private static bool GetDWMBoolValue( string keyName )

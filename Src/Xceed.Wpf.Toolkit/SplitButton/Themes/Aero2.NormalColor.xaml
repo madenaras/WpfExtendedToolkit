@@ -89,6 +89,7 @@
                                         Margin="{TemplateBinding Padding}"
                                         Content="{TemplateBinding Content}"
                                         ContentTemplate="{TemplateBinding ContentTemplate}"
+                                        ContentStringFormat="{TemplateBinding ContentStringFormat}"
                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                         RecognizesAccessKey="true" />
@@ -98,7 +99,8 @@
                 <ToggleButton x:Name="PART_ToggleButton"
                               Grid.Column="1"
                               IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                              IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}">
+                              IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
+                              ToolTip="{Binding DropDownTooltip, RelativeSource={RelativeSource TemplatedParent}}">
                   <ToggleButton.Template>
                     <ControlTemplate TargetType="ToggleButton">
                       <ContentPresenter />

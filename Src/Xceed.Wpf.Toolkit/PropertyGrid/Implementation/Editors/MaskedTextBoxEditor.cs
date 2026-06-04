@@ -15,11 +15,7 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
@@ -44,7 +40,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 
     protected override void SetControlProperties( PropertyItem propertyItem )
     {
-      Editor.BorderThickness = new System.Windows.Thickness( 0 );
+      // Do not set Editor properties which could not be overriden in a user style.
+
       this.Editor.ValueDataType = this.ValueDataType;
       this.Editor.Mask = this.Mask;
     }

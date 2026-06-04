@@ -29,6 +29,7 @@ using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Linq.Expressions;
 using System.Diagnostics;
 using System.Globalization;
+using System.Windows.Threading;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -223,14 +224,17 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal void SetRedInvalidBorder( BindingExpression be )
     {
-      if( (be != null) && be.DataItem is DescriptorPropertyDefinitionBase )
+      if( ( be != null ) && be.DataItem is DescriptorPropertyDefinitionBase )
       {
-        DescriptorPropertyDefinitionBase descriptor = be.DataItem as DescriptorPropertyDefinitionBase;
-        if( Validation.GetHasError( descriptor ) )
+        this.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
         {
-          ReadOnlyObservableCollection<ValidationError> errors = Validation.GetErrors( descriptor );
-          Validation.MarkInvalid( be, errors[ 0 ] );
-        }
+          DescriptorPropertyDefinitionBase descriptor = be.DataItem as DescriptorPropertyDefinitionBase;
+          if( ( descriptor != null ) && Validation.GetHasError( descriptor ) )
+          {
+            var errors = Validation.GetErrors( descriptor );
+            Validation.MarkInvalid( be, errors[ 0 ] );
+          }
+        } ) );
       }
     }
 

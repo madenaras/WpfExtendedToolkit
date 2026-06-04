@@ -64,13 +64,6 @@ namespace Xceed.Wpf.Toolkit
     #region DialogResult
 
     private bool? _dialogResult;
-    /// <summary>
-    /// Gets or sets a value indicating whether the ChildWindow was accepted or canceled.
-    /// </summary>
-    /// <value>
-    /// True if the child window was accepted; false if the child window was
-    /// canceled. The default is null.
-    /// </value>
     [TypeConverter( typeof( NullableBoolConverter ) )]
     public bool? DialogResult
     {
@@ -329,6 +322,8 @@ namespace Xceed.Wpf.Toolkit
 
     public ChildWindow()
     {
+      Core.Message.ShowMessage();
+
       DesignerWindowState = Xceed.Wpf.Toolkit.WindowState.Open;
 
       _modalLayer.Fill = OverlayBrush;
@@ -343,7 +338,10 @@ namespace Xceed.Wpf.Toolkit
 
     internal override bool AllowPublicIsActiveChange
     {
-      get { return false; }
+      get
+      {
+        return false;
+      }
     }
 
     public override void OnApplyTemplate()
@@ -460,7 +458,7 @@ namespace Xceed.Wpf.Toolkit
           e.Handled = true;
         }
         // Prevent Tab when no children
-        else if( (e.Key == Key.Tab) && !_hasChildren )
+        else if( ( e.Key == Key.Tab ) && !_hasChildren )
         {
           e.Handled = true;
         }
@@ -632,7 +630,7 @@ namespace Xceed.Wpf.Toolkit
       if( _parentContainer != null )
       {
         _parentContainer.LayoutUpdated -= ParentContainer_LayoutUpdated;
-        _parentContainer.SizeChanged -= ParentContainer_SizeChanged;        
+        _parentContainer.SizeChanged -= ParentContainer_SizeChanged;
 
         //this is for XBAP applications only. When inside an XBAP the parent container has no height or width until it has loaded. Therefore
         //we need to handle the loaded event and reposition the window.
@@ -660,7 +658,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void ChildWindow_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
     {
-      if( (bool)e.NewValue && this.IsModal )
+      if( ( bool )e.NewValue && this.IsModal )
       {
         this.Focus();
       }
@@ -682,7 +680,7 @@ namespace Xceed.Wpf.Toolkit
       if( Left < 0 )
         return 0;
 
-      if( ( _parentContainer != null ) && (_windowRoot != null) )
+      if( ( _parentContainer != null ) && ( _windowRoot != null ) )
       {
         if( Left + _windowRoot.ActualWidth > _parentContainer.ActualWidth && _parentContainer.ActualWidth != 0 )
         {
@@ -762,7 +760,7 @@ namespace Xceed.Wpf.Toolkit
 
       if( !_hasWindowContainer )
         if( WindowStartupLocation == Xceed.Wpf.Toolkit.WindowStartupLocation.Center )
-          CenterChildWindow(); 
+          CenterChildWindow();
 
       if( !_hasWindowContainer )
         BringToFront();
@@ -846,9 +844,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Events
 
-    /// <summary>
-    /// Occurs when the ChildWindow is closed.
-    /// </summary>
     public event EventHandler Closed;
     protected virtual void OnClosed( EventArgs e )
     {
@@ -856,9 +851,6 @@ namespace Xceed.Wpf.Toolkit
         Closed( this, e );
     }
 
-    /// <summary>
-    /// Occurs when the ChildWindow is closing.
-    /// </summary>
     public event EventHandler<CancelEventArgs> Closing;
     protected virtual void OnClosing( CancelEventArgs e )
     {

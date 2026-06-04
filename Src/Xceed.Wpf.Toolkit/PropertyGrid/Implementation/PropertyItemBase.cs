@@ -378,6 +378,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     internal PropertyItemBase()
     {
+      this.DataContext = this;
       this.GotFocus += new RoutedEventHandler( PropertyItemBase_GotFocus );
       this.RequestBringIntoView += this.PropertyItemBase_RequestBringIntoView;
       AddHandler( PropertyItemsControl.PreparePropertyItemEvent, new PropertyItemEventHandler( OnPreparePropertyItemInternal ) );

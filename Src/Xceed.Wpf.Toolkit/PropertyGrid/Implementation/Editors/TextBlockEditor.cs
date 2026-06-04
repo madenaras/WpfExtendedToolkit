@@ -14,13 +14,29 @@
 
   ***********************************************************************************/
 
-using System.Windows.Controls;
+using System;
+using System.ComponentModel;
+using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using Xceed.Wpf.Toolkit.Core;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class TextBlockEditor : TypeEditor<TextBlock>
   {
+    TypeConverter _typeConverter;
+
+    public TextBlockEditor()
+    {
+    }
+
+    public TextBlockEditor( TypeConverter typeConverter )
+    {
+      _typeConverter = typeConverter;
+    }
+
     protected override TextBlock CreateEditor()
     {
       return new PropertyGridEditorTextBlock();
@@ -31,12 +47,11 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       ValueProperty = TextBlock.TextProperty;
     }
 
-    protected override void SetControlProperties( PropertyItem propertyItem )
-    {
-      Editor.Margin = new System.Windows.Thickness( 5, 0, 0, 0 );
-      Editor.TextTrimming = TextTrimming.CharacterEllipsis;
-    }
   }
+
+
+
+
 
   public class PropertyGridEditorTextBlock : TextBlock
   {

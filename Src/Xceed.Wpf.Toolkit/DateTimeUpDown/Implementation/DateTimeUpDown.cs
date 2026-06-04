@@ -218,6 +218,8 @@ namespace Xceed.Wpf.Toolkit
 
     public DateTimeUpDown()
     {
+      Core.Message.ShowMessage();
+
       this.Loaded += this.DateTimeUpDown_Loaded;
     }
 
@@ -943,7 +945,7 @@ namespace Xceed.Wpf.Toolkit
       return this.CoerceValueMinMax( result );
     }
 
-    private bool TryParseDateTime( string text, out DateTime result )
+    protected virtual bool TryParseDateTime( string text, out DateTime result )
     {
       bool isValid = false;
       result = this.ContextNow;
@@ -958,7 +960,7 @@ namespace Xceed.Wpf.Toolkit
 
         isValid = DateTimeParser.TryParse( text, this.GetFormatString( Format ), current, this.CultureInfo, this.AutoClipTimeParts, out result );
       }
-      catch( FormatException )
+      catch( Exception )
       {
         isValid = false;
       }

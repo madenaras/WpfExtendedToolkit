@@ -23,6 +23,8 @@ using System.Windows.Controls;
 using System.Collections.Generic;
 using System.Windows.Controls.Primitives;
 using Xceed.Wpf.Toolkit.Primitives;
+using System.ComponentModel;
+
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -49,6 +51,8 @@ namespace Xceed.Wpf.Toolkit
 
     public CheckComboBox()
     {
+
+      Core.Message.ShowMessage();
 
       Keyboard.AddKeyDownHandler( this, OnKeyDown );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );
@@ -181,6 +185,42 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion
 
+
+    #region Watermark
+
+    public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register( "Watermark", typeof( object ), typeof( CheckComboBox ), new UIPropertyMetadata( null ) );
+    public object Watermark
+    {
+        get
+        {
+            return ( object )GetValue( WatermarkProperty );
+        }
+        set
+        {
+            SetValue( WatermarkProperty, value );
+        }
+    }
+
+    #endregion //Watermark
+
+    #region Watermark Template
+
+    public static readonly DependencyProperty WatermarkTemplateProperty = DependencyProperty.Register("WatermarkTemplate", typeof(DataTemplate), typeof(CheckComboBox), new UIPropertyMetadata(null));
+
+    public DataTemplate WatermarkTemplate
+    {
+        get
+        {
+            return (DataTemplate)GetValue(WatermarkTemplateProperty);
+        }
+        set
+        {
+            SetValue(WatermarkTemplateProperty, value);
+        }
+    }
+
+    #endregion //Watermark Template
+
     #endregion //Properties
 
     #region Base Class Overrides
@@ -201,6 +241,11 @@ namespace Xceed.Wpf.Toolkit
     {
       base.OnItemsSourceChanged( oldValue, newValue );
       this.UpdateDisplayMemberPathValuesBindings();
+    }
+
+    protected override void OnIsAllItemsSelectedContentActiveChanged( bool oldValue, bool newValue )
+    {
+      this.UpdateText();
     }
 
     public override void OnApplyTemplate()
@@ -263,8 +308,8 @@ namespace Xceed.Wpf.Toolkit
     private void Popup_Opened( object sender, EventArgs e )
     {
       UIElement item = ItemContainerGenerator.ContainerFromItem( SelectedItem ) as UIElement;
-      if( (item == null) && (Items.Count > 0) )
-        item = ItemContainerGenerator.ContainerFromItem( Items[0] ) as UIElement;
+      if( ( item == null ) && ( Items.Count > 0 ) )
+        item = ItemContainerGenerator.ContainerFromItem( Items[ 0 ] ) as UIElement;
       if( item != null )
         item.Focus();
     }
@@ -309,17 +354,23 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void UpdateText()
     {
+      if( this.IsAllItemsSelectedContentActive && (this.Items.Count == this.SelectedItems.Count) )
+      {
+        this.SetCurrentValue( CheckComboBox.TextProperty, this.AllItemsSelectedContent );
+        return;
+      }
+
 #if VS2008
-      string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ).ToString() ).ToArray() ); 
+      string newValue = String.Join( this.Delimiter, this.SelectedItems.Cast<object>().Select( x => this.GetItemDisplayValue( x ).ToString() ).ToArray() ); 
 #else
-      string newValue = String.Join( Delimiter, SelectedItems.Cast<object>().Select( x => GetItemDisplayValue( x ) ) );
+      string newValue = String.Join( this.Delimiter, this.SelectedItems.Cast<object>().Select( x => this.GetItemDisplayValue( x ) ) );
 #endif
 
-      if( String.IsNullOrEmpty( Text ) || !Text.Equals( newValue ) )
+      if( String.IsNullOrEmpty( this.Text ) || !this.Text.Equals( newValue ) )
       {
         _ignoreTextValueChanged = true;
 #if VS2008
-        Text = newValue;
+        this.Text = newValue;
 #else
         this.SetCurrentValue( CheckComboBox.TextProperty, newValue );
 #endif
@@ -337,10 +388,6 @@ namespace Xceed.Wpf.Toolkit
       this.UpdateText();
     }
 
-    /// <summary>
-    /// Updates the SelectedItems collection based on the content of
-    /// the Text property.
-    /// </summary>
     private void UpdateFromText()
     {
       List<string> selectedValues = null;
@@ -397,6 +444,6 @@ namespace Xceed.Wpf.Toolkit
         Focus();
     }
 
-#endregion //Methods
+    #endregion //Methods
   }
 }

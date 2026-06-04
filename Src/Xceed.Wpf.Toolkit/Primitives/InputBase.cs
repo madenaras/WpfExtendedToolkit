@@ -139,6 +139,25 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     #endregion //IsUndoEnabled
 
+    #region CaretBrush
+
+    public static readonly DependencyProperty CaretBrushProperty = DependencyProperty.Register( "CaretBrush", typeof( System.Windows.Media.Brush ),
+                                                                            typeof( InputBase ), new UIPropertyMetadata( null ) );
+
+    public System.Windows.Media.Brush CaretBrush
+    {
+        get 
+        { 
+           return ( System.Windows.Media.Brush )GetValue( CaretBrushProperty ); 
+        }
+        set 
+        { 
+           SetValue( CaretBrushProperty, value ); 
+        }
+    }
+
+    #endregion
+
     #region Text
 
     public static readonly DependencyProperty TextProperty = DependencyProperty.Register( "Text", typeof( string ), typeof( InputBase ), new FrameworkPropertyMetadata( default( String ), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnTextChanged, null, false, UpdateSourceTrigger.LostFocus ) );

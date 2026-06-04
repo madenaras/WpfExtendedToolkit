@@ -24,10 +24,10 @@ using System.Windows.Media;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 using System.Diagnostics;
 using System.ComponentModel;
-using System.Windows.Markup.Primitives;
 using System.Windows.Data;
 #if !VS2008
 using System.ComponentModel.DataAnnotations;
+using System.Windows.Threading;
 #endif
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
@@ -131,7 +131,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       }
     }
 
-    protected abstract BindingBase CreateValueBinding();
+    protected abstract void CreateValueBinding();
 
     #endregion
 
@@ -682,8 +682,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       _commandBindings = new CommandBinding[] { new CommandBinding( PropertyItemCommands.ResetValue, ExecuteResetValueCommand, CanExecuteResetValueCommand ) };
 
 
-      BindingBase valueBinding = this.CreateValueBinding();
-      BindingOperations.SetBinding( this, DescriptorPropertyDefinitionBase.ValueProperty, valueBinding );
+      this.CreateValueBinding();
     }
 
 

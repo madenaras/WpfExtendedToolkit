@@ -30,6 +30,8 @@ namespace Xceed.Wpf.Toolkit
 
     public CheckListBox()
     {
+
+      Core.Message.ShowMessage();
     }
 
     #endregion //Constructors

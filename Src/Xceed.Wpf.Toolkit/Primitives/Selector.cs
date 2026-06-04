@@ -16,17 +16,17 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Reflection;
 using Xceed.Wpf.Toolkit.Core.Utilities;
+using Xceed.Wpf.Toolkit.PropertyGrid;
+using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
 namespace Xceed.Wpf.Toolkit.Primitives
 {
@@ -96,7 +96,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     private static void OnDelimiterChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
-      ( (Selector)o ).OnSelectedItemChanged( (string)e.OldValue, (string)e.NewValue );
+      ( ( Selector )o ).OnSelectedItemChanged( ( string )e.OldValue, ( string )e.NewValue );
     }
 
     protected virtual void OnSelectedItemChanged( string oldValue, string newValue )
@@ -263,7 +263,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     private static void OnSelectedMemberPathChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
     {
       Selector sel = ( ( Selector )o );
-      sel.OnSelectedMemberPathChanged( (string)e.OldValue, (string)e.NewValue );
+      sel.OnSelectedMemberPathChanged( ( string )e.OldValue, ( string )e.NewValue );
     }
 
     protected virtual void OnSelectedMemberPathChanged( string oldValue, string newValue )
@@ -300,8 +300,11 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected virtual void OnSelectedValueChanged( string oldValue, string newValue )
     {
-      if( !this.IsInitialized || _ignoreSelectedValueChanged )
-        return;
+      if( !( this is PropertyGridEditorEnumCheckComboBox ) )
+      {
+        if( !this.IsInitialized || _ignoreSelectedValueChanged )
+          return;
+      }
 
       UpdateFromSelectedValue();
     }
@@ -372,7 +375,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       _surpressItemSelectionChanged = true;
       var selectorItem = element as FrameworkElement;
 
-      selectorItem.SetValue( SelectorItem.IsSelectedProperty, SelectedItems.Contains(item) );
+      selectorItem.SetValue( SelectorItem.IsSelectedProperty, SelectedItems.Contains( item ) );
 
       _surpressItemSelectionChanged = false;
     }
@@ -397,10 +400,13 @@ namespace Xceed.Wpf.Toolkit.Primitives
       if( !this.IsInitialized )
         return;
 
-      if( !VirtualizingStackPanel.GetIsVirtualizing( this )
-        || (VirtualizingStackPanel.GetIsVirtualizing( this ) && (newValue != null)) )
+      if( this.SelectedItemsOverride == null )
       {
-        this.RemoveUnavailableSelectedItems();
+        if( !VirtualizingStackPanel.GetIsVirtualizing( this )
+        || ( VirtualizingStackPanel.GetIsVirtualizing( this ) && ( newValue != null ) ) )
+        {
+          this.RemoveUnavailableSelectedItems();
+        }
       }
 
       this.UpdateSelectedMemberPathValuesBindings();
@@ -411,7 +417,10 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       base.OnItemsChanged( e );
 
-      this.RemoveUnavailableSelectedItems();
+      if( this.ItemsSource == null )
+      {
+        this.RemoveUnavailableSelectedItems();
+      }
     }
 
     // When a DataTemplate includes a CheckComboBox, some bindings are
@@ -477,11 +486,33 @@ namespace Xceed.Wpf.Toolkit.Primitives
         || propertyPath == "." )
         return item;
 
+      if( propertyPath.Contains( "." ) )
+      {
+        object objectValue = item;
+        var parts = propertyPath.Split( new char[] { '.' } );
 
-      PropertyInfo prop = item.GetType().GetProperty( propertyPath );
-      return ( prop != null )
-        ? prop.GetValue( item, null )
-        : null;
+        foreach( var part in parts )
+        {
+          var prop = objectValue.GetType().GetProperty( part );
+          if( prop != null )
+          {
+            objectValue = prop.GetValue( objectValue, null );
+          }
+          else
+          {
+            return null;
+          }
+        }
+
+        return objectValue;
+      }
+      else
+      {
+        var prop = item.GetType().GetProperty( propertyPath );
+        return ( prop != null )
+          ? prop.GetValue( item, null )
+          : null;
+      }
     }
 
     protected object GetItemValue( object item )
@@ -517,7 +548,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       // and let the synchronization be made from UpdateFromSelectedItems();
       SelectedItems.Clear();
 
-      if( (selectedValues != null) && (selectedValues.Count > 0) )
+      if( ( selectedValues != null ) && ( selectedValues.Count > 0 ) )
       {
         ValueEqualityComparer comparer = new ValueEqualityComparer();
 
@@ -525,13 +556,32 @@ namespace Xceed.Wpf.Toolkit.Primitives
         {
           object itemValue = GetItemfunction( item );
 
-          bool isSelected = (itemValue != null)
+          bool isSelected = ( itemValue != null )
             && selectedValues.Contains( itemValue.ToString(), comparer );
 
           if( isSelected )
           {
             SelectedItems.Add( item );
           }
+        }
+      }
+      _ignoreSelectedItemsCollectionChanged--;
+
+      this.UpdateFromSelectedItems();
+    }
+
+    internal void UpdateSelectedItemsWithoutNotifications( List<object> selectedValues )
+    {
+      _ignoreSelectedItemsCollectionChanged++;
+      // Just update the SelectedItems collection content 
+      // and let the synchronization be made from UpdateFromSelectedItems();
+      this.SelectedItems.Clear();
+
+      if( ( selectedValues != null ) && ( selectedValues.Count > 0 ) )
+      {
+        foreach( object item in this.ItemsCollection )
+        {
+          this.SelectedItems.Add( item );
         }
       }
       _ignoreSelectedItemsCollectionChanged--;
@@ -550,7 +600,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       if( nameParts.Length == 1 )
       {
         var property = item.GetType().GetProperty( this.SelectedMemberPath );
-        if( (property != null) && (property.PropertyType == typeof( bool )) )
+        if( ( property != null ) && ( property.PropertyType == typeof( bool ) ) )
           return property.GetValue( item, null ) as bool?;
         return null;
       }
@@ -588,7 +638,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       if( nameParts.Length == 1 )
       {
         var property = item.GetType().GetProperty( this.SelectedMemberPath );
-        if( (property != null) && (property.PropertyType == typeof( bool )) )
+        if( ( property != null ) && ( property.PropertyType == typeof( bool ) ) && ( ( bool )property.GetValue( item, null ) != value ) )
         {
           property.SetValue( item, value, null );
         }
@@ -616,15 +666,13 @@ namespace Xceed.Wpf.Toolkit.Primitives
       }
     }
 
-    /// <summary>
-    /// When SelectedItems collection implements INotifyPropertyChanged, this is the callback.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
     protected virtual void OnSelectedItemsCollectionChanged( object sender, NotifyCollectionChangedEventArgs e )
     {
       if( _ignoreSelectedItemsCollectionChanged > 0 )
         return;
+
+      // Keep it simple for now. Just update all
+      this.UpdateFromSelectedItems();
 
       if( e.Action == NotifyCollectionChangedAction.Reset )
       {
@@ -665,9 +713,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
           }
         }
       }
-
-      // Keep it simple for now. Just update all
-      this.UpdateFromSelectedItems();
     }
 
     private void OnItemSelectionChangedCore( RoutedEventArgs args, bool unselected )
@@ -678,6 +723,14 @@ namespace Xceed.Wpf.Toolkit.Primitives
       if( item == DependencyProperty.UnsetValue )
       {
         item = args.OriginalSource;
+      }
+
+      var itemselectionChangingArgs = new ItemSelectionChangingEventArgs( item, !unselected );
+      this.OnItemSelectionChanging( itemselectionChangingArgs );
+      if( itemselectionChangingArgs.Cancel )
+      {
+        this.UpdateSelectorItem( item, unselected, false );
+        return;
       }
 
       if( unselected )
@@ -692,11 +745,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
       }
     }
 
-    /// <summary>
-    /// When the ItemsSource implements INotifyPropertyChanged, this is the change callback.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
     private void OnItemsSourceCollectionChanged( object sender, NotifyCollectionChangedEventArgs args )
     {
       this.RemoveUnavailableSelectedItems();
@@ -705,10 +753,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
       this.UpdateValueMemberPathValuesBindings();
     }
 
-    /// <summary>
-    /// This is called when any value of any item referenced by SelectedMemberPath
-    /// is modified. This may affect the SelectedItems collection.
-    /// </summary>
     private void OnSelectedMemberPathValuesChanged()
     {
       if( _ignoreSelectedMemberPathValuesChanged > 0 )
@@ -717,10 +761,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
       this.UpdateFromSelectedMemberPathValues();
     }
 
-    /// <summary>
-    /// This is called when any value of any item referenced by ValueMemberPath
-    /// is modified. This will affect the SelectedValue property
-    /// </summary>
     private void OnValueMemberPathValuesChanged()
     {
       this.UpdateSelectedValue();
@@ -737,11 +777,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
       _valueMemberPathValuesHelper.UpdateValueSource( ItemsCollection, ValueMemberPath );
     }
 
-    /// <summary>
-    /// This method will be called when the "IsSelected" property of an SelectorItem
-    /// has been modified.
-    /// </summary>
-    /// <param name="args"></param>
     protected virtual void OnItemSelectionChanged( ItemSelectionChangedEventArgs args )
     {
       if( _surpressItemSelectionChanged )
@@ -750,9 +785,16 @@ namespace Xceed.Wpf.Toolkit.Primitives
       RaiseEvent( args );
     }
 
-    /// <summary>
-    /// Updates the SelectedValue property based on what is present in the SelectedItems property.
-    /// </summary>
+    public event EventHandler<ItemSelectionChangingEventArgs> ItemSelectionChanging;
+
+    protected virtual void OnItemSelectionChanging( ItemSelectionChangingEventArgs args )
+    {
+      if( ItemSelectionChanging != null )
+      {
+        ItemSelectionChanging( this, args );
+      }
+    }
+
     private void UpdateSelectedValue()
     {
 #if VS2008
@@ -768,9 +810,6 @@ namespace Xceed.Wpf.Toolkit.Primitives
       }
     }
 
-    /// <summary>
-    /// Updates the SelectedItem property based on what is present in the SelectedItems property.
-    /// </summary>
     private void UpdateSelectedItem()
     {
       if( !SelectedItems.Contains( SelectedItem ) )
@@ -781,36 +820,38 @@ namespace Xceed.Wpf.Toolkit.Primitives
       }
     }
 
-    /// <summary>
-    /// Update the SelectedItems collection based on the values 
-    /// refered to by the SelectedMemberPath property.
-    /// </summary>
     private void UpdateFromSelectedMemberPathValues()
     {
       _ignoreSelectedItemsCollectionChanged++;
-      foreach( var item in ItemsCollection )
+      foreach( var item in this.ItemsCollection )
       {
-        bool? isSelected = this.GetSelectedMemberPathValue( item );
+        var isSelected = this.GetSelectedMemberPathValue( item );
         if( isSelected != null )
         {
           if( isSelected.Value )
           {
-            if( !SelectedItems.Contains( item ) )
+            if( !this.SelectedItems.Contains( item ) )
             {
-              SelectedItems.Add( item );
+              this.SelectedItems.Add( item );
             }
           }
           else
           {
-            if( SelectedItems.Contains( item ) )
+            if( this.SelectedItems.Contains( item ) )
             {
-              SelectedItems.Remove( item );
+              this.SelectedItems.Remove( item );
             }
           }
+
+          this.UpdateSelectorItem( item, isSelected.Value );
         }
       }
       _ignoreSelectedItemsCollectionChanged--;
-      this.UpdateFromSelectedItems();
+
+      this.UpdateSelectedItem();
+      this.UpdateSelectedValue();
+
+      this.UpdateInternalSelectedItems();
     }
 
     internal void UpdateSelectedItems( IList selectedItems )
@@ -833,41 +874,40 @@ namespace Xceed.Wpf.Toolkit.Primitives
       this.UpdateFromSelectedItems();
     }
 
-    /// <summary>
-    /// Updates the following based on the content of SelectedItems:
-    /// - All SelectorItems "IsSelected" properties
-    /// - Values refered to by SelectedMemberPath
-    /// - SelectedItem property
-    /// - SelectedValue property
-    /// Refered to by the SelectedMemberPath property.
-    /// </summary>
     private void UpdateFromSelectedItems()
     {
-      foreach( object o in ItemsCollection )
+      foreach( var o in this.ItemsCollection )
       {
-        bool isSelected = SelectedItems.Contains( o );
+        bool isSelected = this.SelectedItems.Contains( o );
 
         _ignoreSelectedMemberPathValuesChanged++;
-        this.SetSelectedMemberPathValue(o, isSelected);
+        this.SetSelectedMemberPathValue( o, isSelected );
         _ignoreSelectedMemberPathValuesChanged--;
 
-        var selectorItem = ItemContainerGenerator.ContainerFromItem( o ) as SelectorItem;
-        if( selectorItem != null )
-        {
-          selectorItem.IsSelected = isSelected;
-        }
+        this.UpdateSelectorItem( o, isSelected );
       }
 
-      UpdateSelectedItem();
-      UpdateSelectedValue();
+      this.UpdateSelectedItem();
+      this.UpdateSelectedValue();
 
+      this.UpdateInternalSelectedItems();
+    }
+
+    private void UpdateInternalSelectedItems()
+    {
       _internalSelectedItems = new object[ this.SelectedItems.Count ];
       this.SelectedItems.CopyTo( _internalSelectedItems, 0 );
     }
 
-    /// <summary>
-    /// Removes all items from SelectedItems that are no longer in ItemsSource.
-    /// </summary>
+    private void UpdateSelectorItem( object item, bool isSelected, bool raiseSelectionChangedEvent = true )
+    {
+      var selectorItem = ItemContainerGenerator.ContainerFromItem( item ) as SelectorItem;
+      if( selectorItem != null )
+      {
+        selectorItem.SetIsSelected( isSelected, raiseSelectionChangedEvent );
+      }
+    }
+
     private void RemoveUnavailableSelectedItems()
     {
       _ignoreSelectedItemsCollectionChanged++;
@@ -897,16 +937,12 @@ namespace Xceed.Wpf.Toolkit.Primitives
         if( hash.Contains( _removedItems[ i ] ) )
         {
           SelectedItems.Add( _removedItems[ i ] );
-          _removedItems.RemoveAt( i );          
+          _removedItems.RemoveAt( i );
           i--;
         }
       }
     }
 
-    /// <summary>
-    /// Updates the SelectedItems collection based on the content of
-    /// the SelectedValue property.
-    /// </summary>
     private void UpdateFromSelectedValue()
     {
       List<string> selectedValues = null;
@@ -981,6 +1017,29 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       Item = item;
       IsSelected = isSelected;
+    }
+  }
+
+  public delegate void ItemSelectionChangingEventHandler( object sender, ItemSelectionChangingEventArgs e );
+  public class ItemSelectionChangingEventArgs : CancelEventArgs
+  {
+    public bool NewIsSelected
+    {
+      get;
+      private set;
+    }
+
+    public object Item
+    {
+      get;
+      private set;
+    }
+
+    public ItemSelectionChangingEventArgs( object item, bool isSelected )
+      : base()
+    {
+      this.Item = item;
+      this.NewIsSelected = isSelected;
     }
   }
 }

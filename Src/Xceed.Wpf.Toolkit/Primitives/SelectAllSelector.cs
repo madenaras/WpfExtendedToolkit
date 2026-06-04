@@ -14,7 +14,9 @@
 
   ***********************************************************************************/
 
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 
 namespace Xceed.Wpf.Toolkit.Primitives
@@ -31,6 +33,65 @@ namespace Xceed.Wpf.Toolkit.Primitives
     #endregion
 
     #region Properties
+
+    #region AllItemsSelectedContent
+
+    public static readonly DependencyProperty AllItemsSelectedContentProperty = DependencyProperty.Register( "AllItemsSelectedContent", typeof( string ), typeof( SelectAllSelector )
+      , new UIPropertyMetadata( "All", OnAllItemsSelectedContentChanged ) );
+    public string AllItemsSelectedContent
+    {
+      get
+      {
+        return ( string )GetValue( AllItemsSelectedContentProperty );
+      }
+      set
+      {
+        SetValue( AllItemsSelectedContentProperty, value );
+      }
+    }
+
+    private static void OnAllItemsSelectedContentChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var selectAllSelector = o as SelectAllSelector;
+      if( selectAllSelector != null )
+        selectAllSelector.OnAllItemsSelectedContentChanged( ( string )e.OldValue, ( string )e.NewValue );
+    }
+
+    protected virtual void OnAllItemsSelectedContentChanged( string oldValue, string newValue )
+    {
+    }
+
+    #endregion // SelectAllText
+
+    #region IsAllItemsSelectedContentActive
+
+    public static readonly DependencyProperty IsAllItemsSelectedContentActiveProperty = DependencyProperty.Register( "IsAllItemsSelectedContentActive", typeof( bool ), typeof( SelectAllSelector ), new UIPropertyMetadata( false, OnIsAllItemsSelectedContentActiveChanged ) );
+    public bool IsAllItemsSelectedContentActive
+    {
+      get
+      {
+        return ( bool )GetValue( IsAllItemsSelectedContentActiveProperty );
+      }
+      set
+      {
+        SetValue( IsAllItemsSelectedContentActiveProperty, value );
+      }
+    }
+
+    private static void OnIsAllItemsSelectedContentActiveChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var selector = o as SelectAllSelector;
+      if( selector != null )
+      {
+        selector.OnIsAllItemsSelectedContentActiveChanged( ( bool )e.OldValue, ( bool )e.NewValue );
+      }
+    }
+
+    protected virtual void OnIsAllItemsSelectedContentActiveChanged( bool oldValue, bool newValue )
+    {
+    }
+
+    #endregion //IsAllItemsSelectedContentActive
 
     #region IsSelectAllActive
 
@@ -112,18 +173,41 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     public void SelectAll()
     {
-      foreach( var item in this.ItemsCollection )
+      var currentSelectedItems = new List<object>( this.SelectedItems.Cast<object>() );
+      var items = this.ItemsCollection.Cast<object>();
+
+      // Have a faster selection when there are more than 200 items.
+      this.UpdateSelectedItemsWithoutNotifications( items.ToList() );
+
+      // Raise SelectionChanged for new selected items.
+      var newSelectedItems = items.Except( currentSelectedItems );
+      foreach( var item in newSelectedItems )
       {
-        if( !this.SelectedItems.Contains( item ) )
+        this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, true ) );
+
+        if( this.Command != null )
         {
-          this.SelectedItems.Add( item );
+          this.Command.Execute( item );
         }
       }
     }
 
     public void UnSelectAll()
     {
+      var currentSelectedItems = new List<object>( this.SelectedItems.Cast<object>() );
+
       this.SelectedItems.Clear();
+
+      // Raise SelectionChanged for selected items.
+      foreach( var item in currentSelectedItems )
+      {
+        this.OnItemSelectionChanged( new ItemSelectionChangedEventArgs( Selector.ItemSelectionChangedEvent, this, item, false ) );
+
+        if( this.Command != null )
+        {
+          this.Command.Execute( item );
+        }
+      }
     }
 
     #endregion

@@ -17,7 +17,6 @@
 using System;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Threading;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -39,6 +38,8 @@ namespace Xceed.Wpf.Toolkit
     public RichTextBox( System.Windows.Documents.FlowDocument document )
       : base( document )
     {
+
+      Core.Message.ShowMessage();
     }
 
     #endregion //Constructors
@@ -107,8 +108,8 @@ namespace Xceed.Wpf.Toolkit
 
     protected override void OnTextChanged( System.Windows.Controls.TextChangedEventArgs e )
     {
-      base.OnTextChanged( e );
       this.UpdateTextFromDocument();
+      base.OnTextChanged( e );
     }
 
     private void UpdateTextFromDocument()

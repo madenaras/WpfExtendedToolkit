@@ -73,6 +73,8 @@ namespace Xceed.Wpf.Toolkit
 
     public RichTextBoxFormatBar()
     {
+
+      Core.Message.ShowMessage();
     }
 
     #endregion //Constructors
@@ -91,7 +93,7 @@ namespace Xceed.Wpf.Toolkit
       if( e.AddedItems.Count == 0 )
         return;
 
-      FontFamily editValue = ( FontFamily )e.AddedItems[ 0 ];
+      var editValue = FontUtilities.GetFontFamily( ( string )e.AddedItems[ 0 ] );
       ApplyPropertyValueToSelectedText( TextElement.FontFamilyProperty, editValue );
       _waitingForMouseOver = true;
     }
@@ -210,7 +212,7 @@ namespace Xceed.Wpf.Toolkit
 
       if( _cmbFontFamilies != null )
       {
-        _cmbFontFamilies.ItemsSource = FontUtilities.Families.OrderBy( fontFamily => fontFamily.Source );
+        _cmbFontFamilies.ItemsSource = FontUtilities.Families.OrderBy( fontFamily => FontUtilities.GetFontFamilyName( fontFamily ) ).Select( fontFamily => FontUtilities.GetFontFamilyName( fontFamily ) );
         _cmbFontFamilies.SelectionChanged += new SelectionChangedEventHandler( FontFamily_SelectionChanged );
       }
 
@@ -293,9 +295,9 @@ namespace Xceed.Wpf.Toolkit
         return;
 
       FontFamily currentFontFamily = ( FontFamily )value;
-      if( (currentFontFamily != null) && ( _cmbFontFamilies != null) )
+      if( ( currentFontFamily != null ) && ( _cmbFontFamilies != null ) )
       {
-        _cmbFontFamilies.SelectedItem = currentFontFamily;
+        _cmbFontFamilies.SelectedItem = FontUtilities.GetFontFamilyName( currentFontFamily );
       }
     }
 

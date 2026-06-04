@@ -24,11 +24,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       return new PropertyGridEditorColorPicker();
     }
 
-    protected override void SetControlProperties( PropertyItem propertyItem )
-    {
-      Editor.BorderThickness = new System.Windows.Thickness( 0 );
-      Editor.DisplayColorAndName = true;
-    }
     protected override void SetValueDependencyProperty()
     {
       ValueProperty = ColorPicker.SelectedColorProperty;

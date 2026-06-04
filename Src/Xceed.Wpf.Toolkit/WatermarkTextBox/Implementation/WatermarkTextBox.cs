@@ -86,6 +86,8 @@ namespace Xceed.Wpf.Toolkit
 
     public WatermarkTextBox()
     {
+
+      Core.Message.ShowMessage();
     }
 
     #endregion //Constructors

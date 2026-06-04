@@ -236,6 +236,8 @@ namespace Xceed.Wpf.Toolkit
 
     public Magnifier()
     {
+
+      Core.Message.ShowMessage();
       this.SizeChanged += new SizeChangedEventHandler( OnSizeChangedEvent );
     }
 

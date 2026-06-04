@@ -20,7 +20,6 @@ using System.ComponentModel;
 using System.Windows.Data;
 using System;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using System.Linq;
 using System.Collections;
@@ -50,19 +49,28 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       DisplayNamePropertyName = ReflectionHelper.GetPropertyOrFieldName( () => p.DisplayName );
     }
 
-    public PropertyItemCollection(ObservableCollection<PropertyItem> editableCollection)
-      :base(editableCollection)
+    public PropertyItemCollection( ObservableCollection<PropertyItem> editableCollection )
+      : base( editableCollection )
     {
       EditableCollection = editableCollection;
     }
 
     internal Predicate<object> FilterPredicate
     {
-      get { return GetDefaultView().Filter; }
-      set { GetDefaultView().Filter = value; }
+      get
+      {
+        return GetDefaultView().Filter;
+      }
+      set
+      {
+        GetDefaultView().Filter = value;
+      }
     }
 
-    public ObservableCollection<PropertyItem> EditableCollection { get; private set; }
+    public ObservableCollection<PropertyItem> EditableCollection
+    {
+      get; private set;
+    }
 
     private ICollectionView GetDefaultView()
     {
@@ -132,16 +140,14 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         if( groupDescription != null )
         {
           view.GroupDescriptions.Add( groupDescription );
-          if( sortAlphabetically )
-          {
-            SortBy( CategoryOrderPropertyName, ListSortDirection.Ascending );
-            SortBy( CategoryPropertyName, ListSortDirection.Ascending );
-          }
+          SortBy( CategoryOrderPropertyName, ListSortDirection.Ascending );
+          SortBy( CategoryPropertyName, ListSortDirection.Ascending );
         }
+
+        SortBy( PropertyOrderPropertyName, ListSortDirection.Ascending );
 
         if( sortAlphabetically )
         {
-          SortBy( PropertyOrderPropertyName, ListSortDirection.Ascending );
           SortBy( DisplayNamePropertyName, ListSortDirection.Ascending );
         }
       }
@@ -173,7 +179,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
             }
 #endif
             property.HighlightedText = property.DisplayName.ToLower().Contains( text.ToLower() ) ? text : null;
-            return (property.HighlightedText != null);
+            return ( property.HighlightedText != null );
           }
 
           return false;

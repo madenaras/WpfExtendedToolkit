@@ -16,6 +16,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -55,7 +56,26 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    #endregion //WatermarkTemplate
+    #endregion //WatermarkBackground
+
+    #region WatermarkBackground
+
+    public static readonly DependencyProperty WatermarkBackgroundProperty = DependencyProperty.RegisterAttached(
+        "WatermarkBackground", typeof( Brush ), typeof( WatermarkComboBox ), new PropertyMetadata( ( Brush )null ) );
+
+    public Brush WatermarkBackground
+    {
+      get
+      {
+        return ( Brush )GetValue( WatermarkBackgroundProperty );
+      }
+      set
+      {
+        SetValue( WatermarkBackgroundProperty, value );
+      }
+    }
+
+    #endregion //WatermarkBackground
 
     #endregion //Properties
 
@@ -68,6 +88,8 @@ namespace Xceed.Wpf.Toolkit
 
     public WatermarkComboBox()
     {
+
+      Core.Message.ShowMessage();
     }
 
     #endregion //Constructors

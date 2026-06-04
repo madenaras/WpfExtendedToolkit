@@ -18,22 +18,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
-using System.Linq.Expressions;
-using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Core.Utilities;
-using System.Windows.Controls;
-using System.Reflection;
-using System.Windows.Controls.Primitives;
-using Xceed.Wpf.Toolkit.PropertyGrid.Converters;
-using Xceed.Wpf.Toolkit.Primitives;
-using System.IO;
-using System.Net;
+using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -52,16 +44,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
       ITypeEditor editor = null;
 
       var context = new EditorTypeDescriptorContext( null, propertyItem.Instance, propertyItem.PropertyDescriptor );
-      if( (typeConverter != null)
+      if( ( typeConverter != null )
         && typeConverter.GetStandardValuesSupported( context )
         && typeConverter.GetStandardValuesExclusive( context )
         && !( typeConverter is ReferenceConverter )  
-        && (propertyType != typeof( bool )) && (propertyType != typeof( bool? )) )  //Bool type always have a BooleanConverter with standardValues : True/False.
+        && ( propertyType != typeof( bool ) ) && ( propertyType != typeof( bool? ) ) )  //Bool type always have a BooleanConverter with standardValues : True/False.
       {
         var items = typeConverter.GetStandardValues( context );
         editor = new SourceComboBoxEditor( items, typeConverter );
       }
-      else if( propertyType == typeof( string )  )
+      else if( propertyType == typeof( string ) )
         editor = new TextBoxEditor();
       else if( propertyType == typeof( bool ) || propertyType == typeof( bool? ) )
         editor = new CheckBoxEditor();
@@ -91,20 +83,25 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         editor = new DateTimeUpDownEditor();
       else if( ( propertyType == typeof( Color ) ) || ( propertyType == typeof( Color? ) ) )
         editor = new ColorEditor();
-      else if ( propertyType == typeof(Brush) )
-        editor = new BrushEditor();
       else if( propertyType.IsEnum )
-        editor = new EnumComboBoxEditor();
+      {
+        if( propertyType.GetCustomAttributes( typeof( FlagsAttribute ), false ).Length > 0 )
+        {
+          editor = new EnumCheckComboBoxEditor();
+        }
+        else
+        {
+          editor = new EnumComboBoxEditor();
+        }
+      }
       else if( propertyType == typeof( TimeSpan ) || propertyType == typeof( TimeSpan? ) )
         editor = new TimeSpanUpDownEditor();
       else if( propertyType == typeof( FontFamily ) || propertyType == typeof( FontWeight ) || propertyType == typeof( FontStyle ) || propertyType == typeof( FontStretch ) )
         editor = new FontComboBoxEditor();
-      else if (propertyType == typeof(Guid) || propertyType == typeof(Guid?))
+      else if( propertyType == typeof( Guid ) || propertyType == typeof( Guid? ) )
         editor = new MaskedTextBoxEditor() { ValueDataType = propertyType, Mask = "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA" };
-      else if (propertyType == typeof(char) || propertyType == typeof(char?))
+      else if( propertyType == typeof( char ) || propertyType == typeof( char? ) )
         editor = new MaskedTextBoxEditor() { ValueDataType = propertyType, Mask = "&" };
-      else if (propertyType == typeof(IPAddress))
-        editor = new IpTextBoxEditor() { };
       else if( propertyType == typeof( object ) )
         // If any type of object is possible in the property, default to the TextBoxEditor.
         // Useful in some case (e.g., Button.Content).
@@ -117,7 +114,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
         // A List of T
         if( listType != null )
         {
-          if( !listType.IsPrimitive && !listType.Equals( typeof( String ) ) && !listType.IsEnum )
+          // decimal type is not a Primitive type but we should use the PrimitiveTypeCollectionEditor instead of the CollectionEditor for it.
+          if( !listType.IsPrimitive && !listType.Equals( typeof( String ) ) && !listType.IsEnum && !listType.Equals( typeof( decimal ) ) )
             editor = new Xceed.Wpf.Toolkit.PropertyGrid.Editors.CollectionEditor();
           else
             editor = new Xceed.Wpf.Toolkit.PropertyGrid.Editors.PrimitiveTypeCollectionEditor();

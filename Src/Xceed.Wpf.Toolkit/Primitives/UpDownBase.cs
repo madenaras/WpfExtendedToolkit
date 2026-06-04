@@ -15,14 +15,13 @@
   ***********************************************************************************/
 
 using System;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using Xceed.Wpf.Toolkit.Core;
-using Xceed.Wpf.Toolkit.Core.Input;
-using System.Globalization;
 using System.Windows.Threading;
+using Xceed.Wpf.Toolkit.Core.Input;
 
 namespace Xceed.Wpf.Toolkit.Primitives
 {
@@ -32,21 +31,12 @@ namespace Xceed.Wpf.Toolkit.Primitives
   {
     #region Members
 
-    /// <summary>
-    /// Name constant for Text template part.
-    /// </summary>
     internal const string PART_TextBox = "PART_TextBox";
 
-    /// <summary>
-    /// Name constant for Spinner template part.
-    /// </summary>
     internal const string PART_Spinner = "PART_Spinner";
 
     internal bool _isTextChangedFromUI;
 
-    /// <summary>
-    /// Flags if the Text and Value properties are in the process of being sync'd
-    /// </summary>
     private bool _isSyncingTextAndValueProperties;
     private bool _internalValueSet;
 
@@ -74,7 +64,7 @@ new UIPropertyMetadata( true ) );
     {
       get
       {
-        return (bool)GetValue( AllowSpinProperty );
+        return ( bool )GetValue( AllowSpinProperty );
       }
       set
       {
@@ -83,6 +73,23 @@ new UIPropertyMetadata( true ) );
     }
 
     #endregion //AllowSpin
+
+    #region ButtonSpinnerHeight
+
+    public static readonly DependencyProperty ButtonSpinnerHeightProperty = DependencyProperty.Register( "ButtonSpinnerHeight", typeof( double ), typeof( UpDownBase<T> ), new UIPropertyMetadata( double.NaN ) );
+    public double ButtonSpinnerHeight
+    {
+      get
+      {
+        return ( double )GetValue( ButtonSpinnerHeightProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerHeightProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerHeight
 
     #region ButtonSpinnerLocation
 
@@ -93,7 +100,7 @@ new UIPropertyMetadata( true ) );
     {
       get
       {
-        return (Location)GetValue( ButtonSpinnerLocationProperty );
+        return ( Location )GetValue( ButtonSpinnerLocationProperty );
       }
       set
       {
@@ -103,16 +110,90 @@ new UIPropertyMetadata( true ) );
 
     #endregion //ButtonSpinnerLocation
 
-    #region ButtonWidth
-    public double ButtonWidth
+    #region ButtonSpinnerDownContentTemplate
+
+    public static readonly DependencyProperty ButtonSpinnerDownContentTemplateProperty = DependencyProperty.Register( "ButtonSpinnerDownContentTemplate", typeof( DataTemplate ), typeof( UpDownBase<T> ), new UIPropertyMetadata( null ) );
+    public DataTemplate ButtonSpinnerDownContentTemplate
     {
-      get { return (double)GetValue(ButtonWidthProperty); }
-      set { SetValue(ButtonWidthProperty, value); }
+      get
+      {
+        return ( DataTemplate )GetValue( ButtonSpinnerDownContentTemplateProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerDownContentTemplateProperty, value );
+      }
     }
-    public static readonly DependencyProperty ButtonWidthProperty =
-        DependencyProperty.Register("ButtonWidth", typeof(double), typeof(UpDownBase<T>), 
-            new UIPropertyMetadata(SystemParameters.VerticalScrollBarWidth));
-    #endregion //ButtonWidth
+
+    #endregion //ButtonSpinnerDownContentTemplate
+
+    #region ButtonSpinnerDownDisabledContentTemplate
+
+    public static readonly DependencyProperty ButtonSpinnerDownDisabledContentTemplateProperty = DependencyProperty.Register( "ButtonSpinnerDownDisabledContentTemplate", typeof( DataTemplate ), typeof( UpDownBase<T> ), new UIPropertyMetadata( null ) );
+    public DataTemplate ButtonSpinnerDownDisabledContentTemplate
+    {
+      get
+      {
+        return ( DataTemplate )GetValue( ButtonSpinnerDownDisabledContentTemplateProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerDownDisabledContentTemplateProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerDownDisabledContentTemplate
+
+    #region ButtonSpinnerUpContentTemplate
+
+    public static readonly DependencyProperty ButtonSpinnerUpContentTemplateProperty = DependencyProperty.Register( "ButtonSpinnerUpContentTemplate", typeof( DataTemplate ), typeof( UpDownBase<T> ), new UIPropertyMetadata( null ) );
+    public DataTemplate ButtonSpinnerUpContentTemplate
+    {
+      get
+      {
+        return ( DataTemplate )GetValue( ButtonSpinnerUpContentTemplateProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerUpContentTemplateProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerUpContentTemplate
+
+    #region ButtonSpinnerUpDisabledContentTemplate
+
+    public static readonly DependencyProperty ButtonSpinnerUpDisabledContentTemplateProperty = DependencyProperty.Register( "ButtonSpinnerUpDisabledContentTemplate", typeof( DataTemplate ), typeof( UpDownBase<T> ), new UIPropertyMetadata( null ) );
+    public DataTemplate ButtonSpinnerUpDisabledContentTemplate
+    {
+      get
+      {
+        return ( DataTemplate )GetValue( ButtonSpinnerUpDisabledContentTemplateProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerUpDisabledContentTemplateProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerUpDisabledContentTemplate
+
+    #region ButtonSpinnerWidth
+
+    public static readonly DependencyProperty ButtonSpinnerWidthProperty = DependencyProperty.Register( "ButtonSpinnerWidth", typeof( double ), typeof( UpDownBase<T> ), new UIPropertyMetadata( SystemParameters.VerticalScrollBarWidth ) );
+    public double ButtonSpinnerWidth
+    {
+      get
+      {
+        return ( double )GetValue( ButtonSpinnerWidthProperty );
+      }
+      set
+      {
+        SetValue( ButtonSpinnerWidthProperty, value );
+      }
+    }
+
+    #endregion //ButtonSpinnerWidth   
 
     #region ClipValueToMinMax
 
@@ -123,7 +204,7 @@ UpDownBase<T> ), new UIPropertyMetadata( false ) );
     {
       get
       {
-        return (bool)GetValue( ClipValueToMinMaxProperty );
+        return ( bool )GetValue( ClipValueToMinMaxProperty );
       }
       set
       {
@@ -142,7 +223,7 @@ typeof( bool ), typeof( UpDownBase<T> ), new UIPropertyMetadata( false, OnDispla
     {
       get
       {
-        return (bool)GetValue( DisplayDefaultValueOnEmptyTextProperty );
+        return ( bool )GetValue( DisplayDefaultValueOnEmptyTextProperty );
       }
       set
       {
@@ -152,7 +233,7 @@ typeof( bool ), typeof( UpDownBase<T> ), new UIPropertyMetadata( false, OnDispla
 
     private static void OnDisplayDefaultValueOnEmptyTextChanged( DependencyObject source, DependencyPropertyChangedEventArgs args )
     {
-      ((UpDownBase<T>)source).OnDisplayDefaultValueOnEmptyTextChanged( (bool)args.OldValue, (bool)args.NewValue );
+      ( ( UpDownBase<T> )source ).OnDisplayDefaultValueOnEmptyTextChanged( ( bool )args.OldValue, ( bool )args.NewValue );
     }
 
     private void OnDisplayDefaultValueOnEmptyTextChanged( bool oldValue, bool newValue )
@@ -174,7 +255,7 @@ typeof( bool ), typeof( UpDownBase<T> ), new UIPropertyMetadata( false, OnDispla
     {
       get
       {
-        return (T)GetValue( DefaultValueProperty );
+        return ( T )GetValue( DefaultValueProperty );
       }
       set
       {
@@ -184,7 +265,7 @@ typeof( bool ), typeof( UpDownBase<T> ), new UIPropertyMetadata( false, OnDispla
 
     private static void OnDefaultValueChanged( DependencyObject source, DependencyPropertyChangedEventArgs args )
     {
-      ((UpDownBase<T>)source).OnDefaultValueChanged( (T)args.OldValue, (T)args.NewValue );
+      ( ( UpDownBase<T> )source ).OnDefaultValueChanged( ( T )args.OldValue, ( T )args.NewValue );
     }
 
     private void OnDefaultValueChanged( T oldValue, T newValue )
@@ -206,7 +287,7 @@ UIPropertyMetadata( default( T ), OnMaximumChanged, OnCoerceMaximum ) );
     {
       get
       {
-        return (T)GetValue( MaximumProperty );
+        return ( T )GetValue( MaximumProperty );
       }
       set
       {
@@ -218,7 +299,7 @@ UIPropertyMetadata( default( T ), OnMaximumChanged, OnCoerceMaximum ) );
     {
       UpDownBase<T> upDown = o as UpDownBase<T>;
       if( upDown != null )
-        upDown.OnMaximumChanged( (T)e.OldValue, (T)e.NewValue );
+        upDown.OnMaximumChanged( ( T )e.OldValue, ( T )e.NewValue );
     }
 
     protected virtual void OnMaximumChanged( T oldValue, T newValue )
@@ -233,7 +314,7 @@ UIPropertyMetadata( default( T ), OnMaximumChanged, OnCoerceMaximum ) );
     {
       UpDownBase<T> upDown = d as UpDownBase<T>;
       if( upDown != null )
-        return upDown.OnCoerceMaximum( (T)baseValue );
+        return upDown.OnCoerceMaximum( ( T )baseValue );
 
       return baseValue;
     }
@@ -254,7 +335,7 @@ UIPropertyMetadata( default( T ), OnMinimumChanged, OnCoerceMinimum ) );
     {
       get
       {
-        return (T)GetValue( MinimumProperty );
+        return ( T )GetValue( MinimumProperty );
       }
       set
       {
@@ -266,7 +347,7 @@ UIPropertyMetadata( default( T ), OnMinimumChanged, OnCoerceMinimum ) );
     {
       UpDownBase<T> upDown = o as UpDownBase<T>;
       if( upDown != null )
-        upDown.OnMinimumChanged( (T)e.OldValue, (T)e.NewValue );
+        upDown.OnMinimumChanged( ( T )e.OldValue, ( T )e.NewValue );
     }
 
     protected virtual void OnMinimumChanged( T oldValue, T newValue )
@@ -281,7 +362,7 @@ UIPropertyMetadata( default( T ), OnMinimumChanged, OnCoerceMinimum ) );
     {
       UpDownBase<T> upDown = d as UpDownBase<T>;
       if( upDown != null )
-        return upDown.OnCoerceMinimum( (T)baseValue );
+        return upDown.OnCoerceMinimum( ( T )baseValue );
 
       return baseValue;
     }
@@ -295,21 +376,15 @@ UIPropertyMetadata( default( T ), OnMinimumChanged, OnCoerceMinimum ) );
 
     #region MouseWheelActiveTrigger
 
-    /// <summary>
-    /// Identifies the MouseWheelActiveTrigger dependency property
-    /// </summary>
     public static readonly DependencyProperty MouseWheelActiveTriggerProperty = DependencyProperty.Register( "MouseWheelActiveTrigger", typeof(
 
 MouseWheelActiveTrigger ), typeof( UpDownBase<T> ), new UIPropertyMetadata( MouseWheelActiveTrigger.FocusedMouseOver ) );
 
-    /// <summary>
-    /// Get or set when the mouse wheel event should affect the value.
-    /// </summary>
     public MouseWheelActiveTrigger MouseWheelActiveTrigger
     {
       get
       {
-        return (MouseWheelActiveTrigger)GetValue( MouseWheelActiveTriggerProperty );
+        return ( MouseWheelActiveTrigger )GetValue( MouseWheelActiveTriggerProperty );
       }
       set
       {
@@ -332,7 +407,7 @@ MouseWheelActiveTrigger ), typeof( UpDownBase<T> ), new UIPropertyMetadata( Mous
       get
       {
 #pragma warning disable 618
-        return (bool)GetValue( MouseWheelActiveOnFocusProperty );
+        return ( bool )GetValue( MouseWheelActiveOnFocusProperty );
 #pragma warning restore 618
       }
       set
@@ -347,7 +422,7 @@ MouseWheelActiveTrigger ), typeof( UpDownBase<T> ), new UIPropertyMetadata( Mous
     {
       UpDownBase<T> upDownBase = o as UpDownBase<T>;
       if( upDownBase != null )
-        upDownBase.MouseWheelActiveTrigger = ((bool)e.NewValue)
+        upDownBase.MouseWheelActiveTrigger = ( ( bool )e.NewValue )
           ? MouseWheelActiveTrigger.FocusedMouseOver
           : MouseWheelActiveTrigger.MouseOver;
     }
@@ -363,7 +438,7 @@ UpDownBase<T> ), new UIPropertyMetadata( true ) );
     {
       get
       {
-        return (bool)GetValue( ShowButtonSpinnerProperty );
+        return ( bool )GetValue( ShowButtonSpinnerProperty );
       }
       set
       {
@@ -375,13 +450,13 @@ UpDownBase<T> ), new UIPropertyMetadata( true ) );
 
     #region UpdateValueOnEnterKey
 
-    public static readonly DependencyProperty UpdateValueOnEnterKeyProperty = DependencyProperty.Register( "UpdateValueOnEnterKey", typeof( bool ), typeof( UpDownBase<T> ), 
+    public static readonly DependencyProperty UpdateValueOnEnterKeyProperty = DependencyProperty.Register( "UpdateValueOnEnterKey", typeof( bool ), typeof( UpDownBase<T> ),
       new FrameworkPropertyMetadata( false, OnUpdateValueOnEnterKeyChanged ) );
     public bool UpdateValueOnEnterKey
     {
       get
       {
-        return (bool)GetValue( UpdateValueOnEnterKeyProperty );
+        return ( bool )GetValue( UpdateValueOnEnterKeyProperty );
       }
       set
       {
@@ -404,13 +479,13 @@ UpDownBase<T> ), new UIPropertyMetadata( true ) );
 
     #region Value
 
-    public static readonly DependencyProperty ValueProperty = DependencyProperty.Register( "Value", typeof( T ), typeof( UpDownBase<T> ), 
+    public static readonly DependencyProperty ValueProperty = DependencyProperty.Register( "Value", typeof( T ), typeof( UpDownBase<T> ),
       new FrameworkPropertyMetadata( default( T ), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnValueChanged, OnCoerceValue, false, UpdateSourceTrigger.PropertyChanged ) );
     public T Value
     {
       get
       {
-        return (T)GetValue( ValueProperty );
+        return ( T )GetValue( ValueProperty );
       }
       set
       {
@@ -433,7 +508,7 @@ UpDownBase<T> ), new UIPropertyMetadata( true ) );
 
     private static object OnCoerceValue( DependencyObject o, object basevalue )
     {
-      return ((UpDownBase<T>)o).OnCoerceValue( basevalue );
+      return ( ( UpDownBase<T> )o ).OnCoerceValue( basevalue );
     }
 
     protected virtual object OnCoerceValue( object newValue )
@@ -445,7 +520,7 @@ UpDownBase<T> ), new UIPropertyMetadata( true ) );
     {
       UpDownBase<T> upDownBase = o as UpDownBase<T>;
       if( upDownBase != null )
-        upDownBase.OnValueChanged( (T)e.OldValue, (T)e.NewValue );
+        upDownBase.OnValueChanged( ( T )e.OldValue, ( T )e.NewValue );
     }
 
     protected virtual void OnValueChanged( T oldValue, T newValue )
@@ -468,6 +543,8 @@ UpDownBase<T> ), new UIPropertyMetadata( true ) );
 
     internal UpDownBase()
     {
+
+      Core.Message.ShowMessage();
 
       this.AddHandler( Mouse.PreviewMouseDownOutsideCapturedElementEvent, new RoutedEventHandler( this.HandleClickOutsideOfControlWithMouseCapture ),
 
@@ -601,9 +678,9 @@ true );
       {
         var activeTrigger = this.MouseWheelActiveTrigger;
         bool spin = !e.UsingMouseWheel;
-        spin |= (activeTrigger == MouseWheelActiveTrigger.MouseOver);
-        spin |= ( (TextBox  != null) && TextBox.IsFocused && (activeTrigger == MouseWheelActiveTrigger.FocusedMouseOver));
-        spin |= ( (TextBox != null) && TextBox.IsFocused && (activeTrigger == MouseWheelActiveTrigger.Focused) && (Mouse.Captured is Spinner));
+        spin |= ( activeTrigger == MouseWheelActiveTrigger.MouseOver );
+        spin |= ( ( TextBox != null ) && TextBox.IsFocused && ( activeTrigger == MouseWheelActiveTrigger.FocusedMouseOver ) );
+        spin |= ( ( TextBox != null ) && TextBox.IsFocused && ( activeTrigger == MouseWheelActiveTrigger.Focused ) && ( Mouse.Captured is Spinner ) );
 
         if( spin )
         {
@@ -650,17 +727,21 @@ RoutedPropertyChangedEventHandler<object> ), typeof( UpDownBase<T> ) );
       if( e == null )
         throw new ArgumentNullException( "e" );
 
+      if( e.Direction == SpinDirection.Increase )
+      {
+        this.DoIncrement();
+      }
+      else
+      {
+        this.DoDecrement();
+      }
+
       // Raise the Spinned event to user
       EventHandler<SpinEventArgs> handler = this.Spinned;
       if( handler != null )
       {
         handler( this, e );
       }
-
-      if( e.Direction == SpinDirection.Increase )
-        DoIncrement();
-      else
-        DoDecrement();
     }
 
     protected virtual void RaiseValueChangedEvent( T oldValue, T newValue )
@@ -677,30 +758,24 @@ RoutedPropertyChangedEventHandler<object> ), typeof( UpDownBase<T> ) );
       // To be sure that the value is not initialized, it should
       // have no local value, no binding, and equal to the default value.
       bool updateValueFromText =
-        (this.ReadLocalValue( ValueProperty ) == DependencyProperty.UnsetValue)
-        && (BindingOperations.GetBinding( this, ValueProperty ) == null)
-        && (object.Equals( this.Value, ValueProperty.DefaultMetadata.DefaultValue ));
+        ( this.ReadLocalValue( ValueProperty ) == DependencyProperty.UnsetValue )
+        && ( BindingOperations.GetBinding( this, ValueProperty ) == null )
+        && ( object.Equals( this.Value, ValueProperty.DefaultMetadata.DefaultValue ) );
 
       this.SyncTextAndValueProperties( updateValueFromText, Text, !updateValueFromText );
     }
 
-    /// <summary>
-    /// Performs an increment if conditions allow it.
-    /// </summary>
     internal void DoDecrement()
     {
-      if( Spinner == null || (Spinner.ValidSpinDirection & ValidSpinDirections.Decrease) == ValidSpinDirections.Decrease )
+      if( Spinner == null || ( Spinner.ValidSpinDirection & ValidSpinDirections.Decrease ) == ValidSpinDirections.Decrease )
       {
         OnDecrement();
       }
     }
 
-    /// <summary>
-    /// Performs a decrement if conditions allow it.
-    /// </summary>
     internal void DoIncrement()
     {
-      if( Spinner == null || (Spinner.ValidSpinDirection & ValidSpinDirections.Increase) == ValidSpinDirections.Increase )
+      if( Spinner == null || ( Spinner.ValidSpinDirection & ValidSpinDirections.Increase ) == ValidSpinDirections.Increase )
       {
         OnIncrement();
       }
@@ -714,7 +789,7 @@ RoutedPropertyChangedEventHandler<object> ), typeof( UpDownBase<T> ) );
       try
       {
         _isTextChangedFromUI = true;
-        Text = ((TextBox)sender).Text;
+        Text = ( ( TextBox )sender ).Text;
       }
       finally
       {
@@ -724,7 +799,7 @@ RoutedPropertyChangedEventHandler<object> ), typeof( UpDownBase<T> ) );
 
     private void UpDownBase_IsKeyboardFocusWithinChanged( object sender, DependencyPropertyChangedEventArgs e )
     {
-      if( !(bool)e.NewValue )
+      if( !( bool )e.NewValue )
       {
         this.CommitInput();
       }
@@ -837,30 +912,14 @@ RoutedPropertyChangedEventHandler<object> ), typeof( UpDownBase<T> ) );
 
     #region Abstract
 
-    /// <summary>
-    /// Converts the formatted text to a value.
-    /// </summary>
     protected abstract T ConvertTextToValue( string text );
 
-    /// <summary>
-    /// Converts the value to formatted text.
-    /// </summary>
-    /// <returns></returns>
     protected abstract string ConvertValueToText();
 
-    /// <summary>
-    /// Called by OnSpin when the spin direction is SpinDirection.Increase.
-    /// </summary>
     protected abstract void OnIncrement();
 
-    /// <summary>
-    /// Called by OnSpin when the spin direction is SpinDirection.Descrease.
-    /// </summary>
     protected abstract void OnDecrement();
 
-    /// <summary>
-    /// Sets the valid spin directions.
-    /// </summary>
     protected abstract void SetValidSpinDirection();
 
     #endregion //Abstract

@@ -56,7 +56,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( bool )GetValue( IsReadOnlyProperty );
+        return (bool)GetValue( IsReadOnlyProperty );
       }
       set
       {
@@ -73,7 +73,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( ObservableCollection<object> )GetValue( ItemsProperty );
+        return (ObservableCollection<object>)GetValue( ItemsProperty );
       }
       set
       {
@@ -100,7 +100,7 @@ namespace Xceed.Wpf.Toolkit
 
     private static void OnItemsSourceChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
-      var CollectionControl = ( CollectionControl )d;
+      var CollectionControl = (CollectionControl)d;
       if( CollectionControl != null )
         CollectionControl.OnItemSourceChanged( (IEnumerable)e.OldValue, (IEnumerable)e.NewValue );
     }
@@ -116,12 +116,12 @@ namespace Xceed.Wpf.Toolkit
           // We need to Add EditableKeyValuePairs from DictionaryEntries.
           foreach( DictionaryEntry item in dict )
           {
-            var keyType = (item.Key != null) 
+            var keyType = ( item.Key != null )
                           ? item.Key.GetType()
-                          : (dict.GetType().GetGenericArguments().Count() > 0) ? dict.GetType().GetGenericArguments()[0] : typeof( object );
-            var valueType = (item.Value != null)
+                          : ( dict.GetType().GetGenericArguments().Count() > 0 ) ? dict.GetType().GetGenericArguments()[ 0 ] : typeof( object );
+            var valueType = ( item.Value != null )
                           ? item.Value.GetType()
-                          : (dict.GetType().GetGenericArguments().Count() > 1) ? dict.GetType().GetGenericArguments()[ 1 ] : typeof( object );
+                          : ( dict.GetType().GetGenericArguments().Count() > 1 ) ? dict.GetType().GetGenericArguments()[ 1 ] : typeof( object );
             var editableKeyValuePair = ListUtilities.CreateEditableKeyValuePair( item.Key
                                                                                 , keyType
                                                                                 , item.Value
@@ -151,7 +151,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( Type )GetValue( ItemsSourceTypeProperty );
+        return (Type)GetValue( ItemsSourceTypeProperty );
       }
       set
       {
@@ -168,7 +168,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( IList<Type> )GetValue( NewItemTypesProperty );
+        return (IList<Type>)GetValue( NewItemTypesProperty );
       }
       set
       {
@@ -185,7 +185,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( object )GetValue( PropertiesLabelProperty );
+        return (object)GetValue( PropertiesLabelProperty );
       }
       set
       {
@@ -202,7 +202,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( object )GetValue( SelectedItemProperty );
+        return (object)GetValue( SelectedItemProperty );
       }
       set
       {
@@ -219,7 +219,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( object )GetValue( TypeSelectionLabelProperty );
+        return (object)GetValue( TypeSelectionLabelProperty );
       }
       set
       {
@@ -236,7 +236,7 @@ namespace Xceed.Wpf.Toolkit
     {
       get
       {
-        return ( EditorDefinitionCollection )GetValue( EditorDefinitionsProperty );
+        return (EditorDefinitionCollection)GetValue( EditorDefinitionsProperty );
       }
       set
       {
@@ -303,6 +303,8 @@ namespace Xceed.Wpf.Toolkit
 
     public CollectionControl()
     {
+      Core.Message.ShowMessage();
+
       Items = new ObservableCollection<object>();
       CommandBindings.Add( new CommandBinding( ApplicationCommands.New, this.AddNew, this.CanAddNew ) );
       CommandBindings.Add( new CommandBinding( ApplicationCommands.Delete, this.Delete, this.CanDelete ) );
@@ -458,7 +460,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void AddNew( object sender, ExecutedRoutedEventArgs e )
     {
-      var newItem = this.CreateNewItem( ( Type )e.Parameter );
+      var newItem = this.CreateNewItem( (Type)e.Parameter );
 
       this.AddNewCore( newItem );
     }
@@ -527,7 +529,7 @@ namespace Xceed.Wpf.Toolkit
 
     private void CanDuplicate( object sender, CanExecuteRoutedEventArgs e )
     {
-      var t = (e.Parameter != null) ? e.Parameter.GetType() : null;
+      var t = ( e.Parameter != null ) ? e.Parameter.GetType() : null;
       this.CanAddNewCore( t, e );
     }
 
@@ -538,6 +540,10 @@ namespace Xceed.Wpf.Toolkit
 
       var baseItem = e.Parameter;
       var newItemType = baseItem.GetType();
+
+      if( typeof( ICloneable ).IsAssignableFrom( newItemType ) )
+        return ( (ICloneable)baseItem ).Clone();
+
       var newItem = this.CreateNewItem( newItemType );
 
       var type = newItemType;
@@ -620,7 +626,7 @@ namespace Xceed.Wpf.Toolkit
         {
           var propInfoKey = item.GetType().GetProperty( "Key" );
           var propInfoValue = item.GetType().GetProperty( "Value" );
-          if( (propInfoKey != null) && (propInfoValue != null) )
+          if( ( propInfoKey != null ) && ( propInfoValue != null ) )
           {
             dict.Add( propInfoKey.GetValue( item, null ), propInfoValue.GetValue( item, null ) );
           }
@@ -637,7 +643,7 @@ namespace Xceed.Wpf.Toolkit
         if( list.IsFixedSize )
         {
           if( sourceList.Count > list.Count )
-            throw new IndexOutOfRangeException("Exceeding array size.");
+            throw new IndexOutOfRangeException( "Exceeding array size." );
 
           for( int i = 0; i < sourceList.Count; ++i )
             list[ i ] = sourceList[ i ];
@@ -652,9 +658,56 @@ namespace Xceed.Wpf.Toolkit
       }
       else
       {
-        //ICollection<T> (or IList<T>)
+        //IDictionary<T,V>
         var collectionType = collection.GetType();
-        var iCollectionOfTInterface = collectionType.GetInterfaces().FirstOrDefault( x => x.IsGenericType && (x.GetGenericTypeDefinition() == typeof( ICollection<> )) );
+        var dictionaryType = collectionType.DeclaringType;
+        if( dictionaryType != null )
+        {
+          var genericArguments = dictionaryType.GetGenericArguments();
+          if( genericArguments.Length == 2 )
+          {
+            var keyType = genericArguments[ 0 ];
+            var valueType = genericArguments[ 1 ];
+
+#if NET5
+            var dictionaryField = collectionType.GetField( "_dictionary", BindingFlags.NonPublic | BindingFlags.Instance );
+#else
+            var dictionaryField = collectionType.GetField( "dictionary", BindingFlags.NonPublic | BindingFlags.Instance );
+#endif
+            if( dictionaryField != null )
+            {
+              var dictionaryAsIDictionary = dictionaryField.GetValue( collection ) as IDictionary;
+              if( dictionaryAsIDictionary != null )
+              {
+                var keysProperty = dictionaryAsIDictionary.GetType().GetProperty( "Keys" );
+                var keys = (IEnumerable)keysProperty.GetValue( dictionaryAsIDictionary, null );
+
+                var keysList = new List<object>();
+                foreach( var key in keys )
+                {
+                  keysList.Add( key );
+                }
+
+                dictionaryAsIDictionary.Clear();
+
+                var valueEnumerator = ( (IEnumerable)sourceList ).GetEnumerator();
+                var keyEnumerator = keysList.GetEnumerator();
+
+                while( keyEnumerator.MoveNext() && valueEnumerator.MoveNext() )
+                {
+                  var key = keyEnumerator.Current;
+                  var value = valueEnumerator.Current;
+
+                  dictionaryAsIDictionary.Add( key, value );
+                }
+                return;
+              }
+            }
+          }
+        }
+
+        //ICollection<T> (or IList<T>)
+        var iCollectionOfTInterface = collectionType.GetInterfaces().FirstOrDefault( x => x.IsGenericType && ( x.GetGenericTypeDefinition() == typeof( ICollection<> ) ) );
         if( iCollectionOfTInterface != null )
         {
           var argumentType = iCollectionOfTInterface.GetGenericArguments().FirstOrDefault();
@@ -683,7 +736,7 @@ namespace Xceed.Wpf.Toolkit
         var constructor = ItemsSourceType.GetConstructor( Type.EmptyTypes );
         if( constructor != null )
         {
-          collection = ( IEnumerable )constructor.Invoke( null );
+          collection = (IEnumerable)constructor.Invoke( null );
         }
         else if( ItemsSourceType.IsArray )
         {
@@ -707,6 +760,6 @@ namespace Xceed.Wpf.Toolkit
       return ItemsSource;
     }
 
-    #endregion //Methods
+#endregion //Methods
   }
 }

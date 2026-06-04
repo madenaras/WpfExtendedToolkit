@@ -94,5 +94,15 @@ namespace Xceed.Wpf.Toolkit.Core.Utilities
         yield return FontStretches.UltraExpanded;
       }
     }
+
+    internal static FontFamily GetFontFamily( string fontFamilyName )
+    {
+      return FontUtilities.Families.FirstOrDefault( fontFamily => FontUtilities.GetFontFamilyName( fontFamily ) == fontFamilyName );
+    }
+
+    internal static string GetFontFamilyName( FontFamily fontFamily )
+    {
+      return fontFamily.FamilyNames.Values.FirstOrDefault();
+    }
   }
 }

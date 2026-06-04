@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -18,19 +19,16 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Markup;
+using System;
 
 namespace Xceed.Wpf.Toolkit
 {
   public enum Location
   {
     Left,
-    Right,
-    SplitHorizontal
+    Right
   }
 
-  /// <summary>
-  /// Represents a spinner control that includes two Buttons.
-  /// </summary>
   [TemplatePart( Name = PART_IncreaseButton, Type = typeof( ButtonBase ) )]
   [TemplatePart( Name = PART_DecreaseButton, Type = typeof( ButtonBase ) )]
   [ContentProperty( "Content" )]
@@ -40,6 +38,8 @@ namespace Xceed.Wpf.Toolkit
     private const string PART_DecreaseButton = "PART_DecreaseButton";
 
     #region Properties
+
+    #region Public Properties
 
     #region AllowSpin
 
@@ -59,14 +59,17 @@ namespace Xceed.Wpf.Toolkit
     private static void AllowSpinPropertyChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ButtonSpinner source = d as ButtonSpinner;
-      source.OnAllowSpinChanged( (bool)e.OldValue, (bool)e.NewValue );
+      source.OnAllowSpinChanged( ( bool )e.OldValue, ( bool )e.NewValue );
     }
 
     #endregion //AllowSpin
 
+    //[Obsolete( "ButtonSpinnerLocation is obsolete. Use SpinnerLocation instead." )]
     #region ButtonSpinnerLocation
 
+    [Obsolete( "ButtonSpinnerLocation is obsolete. Use SpinnerLocation instead." )]
     public static readonly DependencyProperty ButtonSpinnerLocationProperty = DependencyProperty.Register( "ButtonSpinnerLocation", typeof( Location ), typeof( ButtonSpinner ), new UIPropertyMetadata( Location.Right ) );
+    [Obsolete( "ButtonSpinnerLocation is obsolete. Use SpinnerLocation instead." )]
     public Location ButtonSpinnerLocation
     {
       get
@@ -81,22 +84,127 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //ButtonSpinnerLocation
 
-    #region ButtonWidth
-    public double ButtonWidth
+    #region SpinnerLocation
+
+    public static readonly DependencyProperty SpinnerLocationProperty = DependencyProperty.Register( "SpinnerLocation", typeof( Location ), typeof( ButtonSpinner ), new UIPropertyMetadata( Location.Right ) );
+    public Location SpinnerLocation
     {
-      get { return (double)GetValue(ButtonWidthProperty); }
-      set { SetValue(ButtonWidthProperty, value); }
+      get
+      {
+        return ( Location )GetValue( SpinnerLocationProperty );
+      }
+      set
+      {
+        SetValue( SpinnerLocationProperty, value );
+      }
     }
-    public static readonly DependencyProperty ButtonWidthProperty =
-        DependencyProperty.Register("ButtonWidth", typeof(double), typeof(ButtonSpinner), 
-          new UIPropertyMetadata(SystemParameters.VerticalScrollBarWidth));
-    #endregion //ButtonWidth
+
+    #endregion //SpinnerLocation
+
+    #region SpinnerWidth
+
+    public static readonly DependencyProperty SpinnerWidthProperty = DependencyProperty.Register( "SpinnerWidth", typeof( double ), typeof( ButtonSpinner ), new UIPropertyMetadata( SystemParameters.VerticalScrollBarWidth ) );
+    public double SpinnerWidth
+    {
+      get
+      {
+        return ( double )GetValue( SpinnerWidthProperty );
+      }
+      set
+      {
+        SetValue( SpinnerWidthProperty, value );
+      }
+    }
+
+    #endregion //SpinnerWidth
+
+    #region SpinnerHeight
+
+    public static readonly DependencyProperty SpinnerHeightProperty = DependencyProperty.Register( "SpinnerHeight", typeof( double ), typeof( ButtonSpinner ), new UIPropertyMetadata( double.NaN ) );
+    public double SpinnerHeight
+    {
+      get
+      {
+        return ( double )GetValue( SpinnerHeightProperty );
+      }
+      set
+      {
+        SetValue( SpinnerHeightProperty, value );
+      }
+    }
+
+    #endregion //SpinnerHeight
+
+    #region SpinnerDownContentTemplate
+
+    public static readonly DependencyProperty SpinnerDownContentTemplateProperty = DependencyProperty.Register( "SpinnerDownContentTemplate", typeof( DataTemplate ), typeof( ButtonSpinner ), new UIPropertyMetadata( null ) );
+    public DataTemplate SpinnerDownContentTemplate
+    {
+      get
+      {
+        return ( DataTemplate )GetValue( SpinnerDownContentTemplateProperty );
+      }
+      set
+      {
+        SetValue( SpinnerDownContentTemplateProperty, value );
+      }
+    }
+
+    #endregion //SpinnerDownContentTemplate
+
+    #region SpinnerDownDisabledContentTemplate
+
+    public static readonly DependencyProperty SpinnerDownDisabledContentTemplateProperty = DependencyProperty.Register( "SpinnerDownDisabledContentTemplate", typeof( DataTemplate ), typeof( ButtonSpinner ), new UIPropertyMetadata( null ) );
+    public DataTemplate SpinnerDownDisabledContentTemplate
+    {
+      get
+      {
+        return ( DataTemplate )GetValue( SpinnerDownDisabledContentTemplateProperty );
+      }
+      set
+      {
+        SetValue( SpinnerDownDisabledContentTemplateProperty, value );
+      }
+    }
+
+    #endregion //SpinnerDownDisabledContentTemplate
+
+    #region SpinnerUpContentTemplate
+
+    public static readonly DependencyProperty SpinnerUpContentTemplateProperty = DependencyProperty.Register( "SpinnerUpContentTemplate", typeof( DataTemplate ), typeof( ButtonSpinner ), new UIPropertyMetadata( null ) );
+    public DataTemplate SpinnerUpContentTemplate
+    {
+      get
+      {
+        return ( DataTemplate )GetValue( SpinnerUpContentTemplateProperty );
+      }
+      set
+      {
+        SetValue( SpinnerUpContentTemplateProperty, value );
+      }
+    }
+
+    #endregion //SpinnerUpContentTemplate
+
+    #region SpinnerUpDisabledContentTemplate
+
+    public static readonly DependencyProperty SpinnerUpDisabledContentTemplateProperty = DependencyProperty.Register( "SpinnerUpDisabledContentTemplate", typeof( DataTemplate ), typeof( ButtonSpinner ), new UIPropertyMetadata( null ) );
+    public DataTemplate SpinnerUpDisabledContentTemplate
+    {
+      get
+      {
+        return ( DataTemplate )GetValue( SpinnerUpDisabledContentTemplateProperty );
+      }
+      set
+      {
+        SetValue( SpinnerUpDisabledContentTemplateProperty, value );
+      }
+    }
+
+    #endregion //SpinnerUpDisabledContentTemplate
 
     #region Content
 
-    /// <summary>
-    /// Identifies the Content dependency property.
-    /// </summary>
     public static readonly DependencyProperty ContentProperty = DependencyProperty.Register( "Content", typeof( object ), typeof( ButtonSpinner ), new PropertyMetadata( null, OnContentPropertyChanged ) );
     public object Content
     {
@@ -110,11 +218,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// ContentProperty property changed handler.
-    /// </summary>
-    /// <param name="d">ButtonSpinner that changed its Content.</param>
-    /// <param name="e">Event arguments.</param>
     private static void OnContentPropertyChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
     {
       ButtonSpinner source = d as ButtonSpinner;
@@ -123,12 +226,51 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Content
 
+    //[Obsolete( "ShowButtonSpinner is obsolete. Use ShowSpinner instead." )]
+    #region ShowButtonSpinner
+
+    [Obsolete( "ShowButtonSpinner is obsolete. Use ShowSpinner instead." )]
+    public static readonly DependencyProperty ShowButtonSpinnerProperty = DependencyProperty.Register( "ShowButtonSpinner", typeof( bool ), typeof( ButtonSpinner ), new UIPropertyMetadata( true ) );
+    [Obsolete( "ShowButtonSpinner is obsolete. Use ShowSpinner instead." )]
+    public bool ShowButtonSpinner
+    {
+      get
+      {
+        return ( bool )GetValue( ShowButtonSpinnerProperty );
+      }
+      set
+      {
+        SetValue( ShowButtonSpinnerProperty, value );
+      }
+    }
+
+    #endregion //ShowButtonSpinner
+
+    #region ShowSpinner
+
+    public static readonly DependencyProperty ShowSpinnerProperty = DependencyProperty.Register( "ShowSpinner", typeof( bool ), typeof( ButtonSpinner ), new UIPropertyMetadata( true ) );
+
+    public bool ShowSpinner
+    {
+      get
+      {
+        return ( bool )GetValue( ShowSpinnerProperty );
+      }
+      set
+      {
+        SetValue( ShowSpinnerProperty, value );
+      }
+    }
+
+    #endregion //ShowSpinner
+
+    #endregion //Properties
+
+    #region Private Properties
+
     #region DecreaseButton
 
     private ButtonBase _decreaseButton;
-    /// <summary>
-    /// Gets or sets the DecreaseButton template part.
-    /// </summary>
     private ButtonBase DecreaseButton
     {
       get
@@ -156,9 +298,6 @@ namespace Xceed.Wpf.Toolkit
     #region IncreaseButton
 
     private ButtonBase _increaseButton;
-    /// <summary>
-    /// Gets or sets the IncreaseButton template part.
-    /// </summary>
     private ButtonBase IncreaseButton
     {
       get
@@ -183,24 +322,9 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //IncreaseButton
 
-    #region ShowButtonSpinner
+    #endregion
 
-    public static readonly DependencyProperty ShowButtonSpinnerProperty = DependencyProperty.Register( "ShowButtonSpinner", typeof( bool ), typeof( ButtonSpinner ), new UIPropertyMetadata( true ) );
-    public bool ShowButtonSpinner
-    {
-      get
-      {
-        return ( bool )GetValue( ShowButtonSpinnerProperty );
-      }
-      set
-      {
-        SetValue( ShowButtonSpinnerProperty, value );
-      }
-    }
-
-    #endregion //ShowButtonSpinner
-
-    #endregion //Properties
+    #endregion
 
     #region Constructors
 
@@ -211,6 +335,8 @@ namespace Xceed.Wpf.Toolkit
 
     public ButtonSpinner()
     {
+
+      Core.Message.ShowMessage();
     }
 
     #endregion //Constructors
@@ -227,11 +353,6 @@ namespace Xceed.Wpf.Toolkit
       SetButtonUsage();
     }
 
-    /// <summary>
-    /// Cancel LeftMouseButtonUp events originating from a button that has
-    /// been changed to disabled.
-    /// </summary>
-    /// <param name="e">The data for the event.</param>
     protected override void OnMouseLeftButtonUp( MouseButtonEventArgs e )
     {
       base.OnMouseLeftButtonUp( e );
@@ -282,11 +403,11 @@ namespace Xceed.Wpf.Toolkit
 
             break;
           }
-          case Key.Enter:
+        case Key.Enter:
           {
             //Do not Spin on enter Key when spinners have focus
-            if( ((this.IncreaseButton != null) && (this.IncreaseButton.IsFocused)) 
-              || (( this.DecreaseButton != null ) && this.DecreaseButton.IsFocused ))
+            if( ( ( this.IncreaseButton != null ) && ( this.IncreaseButton.IsFocused ) )
+              || ( ( this.DecreaseButton != null ) && this.DecreaseButton.IsFocused ) )
             {
               e.Handled = true;
             }
@@ -310,11 +431,6 @@ namespace Xceed.Wpf.Toolkit
       }
     }
 
-    /// <summary>
-    /// Called when valid spin direction changed.
-    /// </summary>
-    /// <param name="oldValue">The old value.</param>
-    /// <param name="newValue">The new value.</param>
     protected override void OnValidSpinDirectionChanged( ValidSpinDirections oldValue, ValidSpinDirections newValue )
     {
       SetButtonUsage();
@@ -325,12 +441,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Event Handlers
 
-    /// <summary>
-    /// Handle click event of IncreaseButton and DecreaseButton template parts,
-    /// translating Click to appropriate Spin event.
-    /// </summary>
-    /// <param name="sender">Event sender, should be either IncreaseButton or DecreaseButton template part.</param>
-    /// <param name="e">Event args.</param>
     private void OnButtonClick( object sender, RoutedEventArgs e )
     {
       if( AllowSpin )
@@ -344,11 +454,6 @@ namespace Xceed.Wpf.Toolkit
 
     #region Methods
 
-    /// <summary>
-    /// Occurs when the Content property value changed.
-    /// </summary>
-    /// <param name="oldValue">The old value of the Content property.</param>
-    /// <param name="newValue">The new value of the Content property.</param>
     protected virtual void OnContentChanged( object oldValue, object newValue )
     {
     }
@@ -358,9 +463,6 @@ namespace Xceed.Wpf.Toolkit
       SetButtonUsage();
     }
 
-    /// <summary>
-    /// Disables or enables the buttons based on the valid spin direction.
-    /// </summary>
     private void SetButtonUsage()
     {
       // buttonspinner adds buttons that spin, so disable accordingly.

@@ -140,7 +140,11 @@ namespace Xceed.Wpf.Toolkit
     [SecuritySafeCritical]
     protected override void OnPreviewTextInput( TextCompositionEventArgs e )
     {
-      this.PasswordInsert( e.Text, this.CaretIndex );
+      // Do not insert \r. When AcceptReturn is true, is it already added in OnPreviewKeyDown().
+      if( e.Text != "\r" )
+      {
+        this.PasswordInsert( e.Text, this.CaretIndex );
+      }
 
       e.Handled = true; //Handle to prevent TextChanged when OnPreviewTextInput exist
 
@@ -182,8 +186,6 @@ namespace Xceed.Wpf.Toolkit
             // Add input because it's not added by default.
             this.PasswordInsert( "\r", this.CaretIndex );
           }
-          // Do not add input when AcceptReturn is False.
-          e.Handled = true;  //Handle to prevent TextChanged when OnPreviewKeyDown exist
           break;
         case Key.Escape:
           e.Handled = true;  //Handle to prevent TextChanged when OnPreviewKeyDown exist

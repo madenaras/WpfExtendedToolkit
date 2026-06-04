@@ -60,85 +60,21 @@
                 <ContentPresenter HorizontalAlignment="Stretch"
                                   VerticalAlignment="Stretch"
                                   SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-
-                <Grid x:Name="arrowGlyph"
-                      IsHitTestVisible="False"
-                      Grid.Column="1"
-                      Margin="5">
-                  <Path x:Name="Arrow"
-                        Width="9"
-                        Height="5"
-                        Data="{StaticResource DownArrowGeometry}"
-                        Fill="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
-                        Margin="0,1,0,0" />
-                </Grid>
               </Grid>
             </chrome:ButtonChrome>
           </Grid>
-          <ControlTemplate.Triggers>
-            <Trigger Property="IsEnabled"
-                     Value="False">
-              <Setter Property="Fill"
-                      TargetName="Arrow"
-                      Value="#AFAFAF" />
-            </Trigger>
-          </ControlTemplate.Triggers>
         </ControlTemplate>
       </Setter.Value>
     </Setter>
   </Style>
 
   <Style x:Key="TimeItemStyle"
-         TargetType="ListBoxItem">
+         TargetType="{x:Type ListBoxItem}">
     <Style.Setters>
-    <Setter Property="Padding"
+      <Setter Property="Padding"
               Value="4" />
     </Style.Setters>
-    <Style.Triggers>
-      <!-- MouseOver Only -->
-      <MultiTrigger>
-        <MultiTrigger.Conditions>
-          <Condition Property="IsMouseOver"
-                     Value="True" />
-          <Condition Property="IsSelected"
-                     Value="False" />
-        </MultiTrigger.Conditions>
-        <Setter Property="Background"
-                Value="#FFB8E0F3" />
-        <Setter Property="BorderBrush"
-                Value="#FF26A0DA" />
-      </MultiTrigger>
-
-      <!-- Selected Only -->
-      <MultiTrigger>
-        <MultiTrigger.Conditions>
-          <Condition Property="IsMouseOver"
-                     Value="False" />
-          <Condition Property="IsSelected"
-                     Value="True" />
-        </MultiTrigger.Conditions>
-        <Setter Property="Background"
-                Value="#FFC4E5F6" />
-        <Setter Property="BorderBrush"
-                Value="#FF26A0DA" />
-      </MultiTrigger>
-
-      <!-- MouseOver + Selected -->
-      <MultiTrigger>
-        <MultiTrigger.Conditions>
-          <Condition Property="IsMouseOver"
-                     Value="True" />
-          <Condition Property="IsSelected"
-                     Value="True" />
-        </MultiTrigger.Conditions>
-        <Setter Property="Background"
-                Value="#FFD1E8FF" />
-        <Setter Property="BorderBrush"
-                Value="#FF66A7E8" />
-      </MultiTrigger>
-    </Style.Triggers>
   </Style>
-
 
   <!-- =============================================================================== -->
   <!-- TimePicker                                                                      -->
@@ -161,8 +97,22 @@
             Value="Center" />
     <Setter Property="TextAlignment"
             Value="Right" />
+    <Setter Property="ButtonSpinnerUpContentTemplate"
+            Value="{StaticResource IncreaseGlyphNormalKey}" />
+    <Setter Property="ButtonSpinnerDownContentTemplate"
+            Value="{StaticResource DecreaseGlyphNormalKey}" />
+    <Setter Property="ButtonSpinnerUpDisabledContentTemplate"
+            Value="{StaticResource IncreaseGlyphDisabledKey}" />
+    <Setter Property="ButtonSpinnerDownDisabledContentTemplate"
+            Value="{StaticResource DecreaseGlyphDisabledKey}" />
     <Setter Property="WatermarkTemplate"
             Value="{StaticResource DefaultWatermarkTemplate}" />
+    <Setter Property="DropDownButtonContent"
+            Value="{StaticResource DropDownArrowGlyph}" />
+    <Setter Property="DropDownButtonDisabledContent"
+            Value="{StaticResource DropDownDisabledArrowGlyph}" />
+    <Setter Property="TimeListItemsStyle"
+            Value="{StaticResource TimeItemStyle}" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:TimePicker}">
@@ -178,12 +128,20 @@
                                  HorizontalContentAlignment="Stretch"
                                  VerticalContentAlignment="Stretch"
                                  BorderBrush="{TemplateBinding BorderBrush}"
-                                 ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
+                                 SpinnerLocation="{TemplateBinding ButtonSpinnerLocation}"
+                                 SpinnerWidth="{TemplateBinding ButtonSpinnerWidth}"
+                                 SpinnerHeight="{TemplateBinding ButtonSpinnerHeight}"
+                                 SpinnerUpContentTemplate="{TemplateBinding ButtonSpinnerUpContentTemplate}"
+                                 SpinnerDownContentTemplate="{TemplateBinding ButtonSpinnerDownContentTemplate}"
+                                 SpinnerUpDisabledContentTemplate="{TemplateBinding ButtonSpinnerUpDisabledContentTemplate}"
+                                 SpinnerDownDisabledContentTemplate="{TemplateBinding ButtonSpinnerDownDisabledContentTemplate}"
                                  AllowSpin="{TemplateBinding AllowSpin}"
-                                 ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}">
+                                 ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
+                                 ShowSpinner="{TemplateBinding ShowButtonSpinner}">
               <local:WatermarkTextBox x:Name="PART_TextBox"
                                       BorderThickness="0"
                                       Background="Transparent"
+                                      CaretBrush="{Binding CaretBrush, RelativeSource={RelativeSource TemplatedParent}}" 
                                       FontFamily="{TemplateBinding FontFamily}"
                                       FontSize="{TemplateBinding FontSize}"
                                       FontStretch="{TemplateBinding FontStretch}"
@@ -194,6 +152,7 @@
                                       VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                       IsUndoEnabled="{Binding IsUndoEnabled, RelativeSource={RelativeSource TemplatedParent}}"
                                       IsTabStop="True"
+                                      AutoSelectBehavior="OnFocus"
                                       MinWidth="20"
                                       AcceptsReturn="False"
                                       Padding="{TemplateBinding Padding}"
@@ -206,8 +165,11 @@
             </local:ButtonSpinner>
             <ToggleButton x:Name="_timePickerToggleButton"
                           Grid.Column="1"
+                          Width="{Binding DropDownButtonWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                          Height="{Binding DropDownButtonHeight, RelativeSource={RelativeSource TemplatedParent}}"
                           Background="White"
                           Focusable="False"
+                          Content="{Binding DropDownButtonContent, RelativeSource={RelativeSource TemplatedParent}}"
                           IsChecked="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}}"
                           Style="{StaticResource TimePickerToggleButtonStyle}"
                           IsHitTestVisible="{Binding IsOpen, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolConverter}}"
@@ -239,7 +201,7 @@
                   <ListBox x:Name="PART_TimeListItems"
                            BorderThickness="0"
                            DisplayMemberPath="Display"
-                           ItemContainerStyle="{StaticResource TimeItemStyle}" >
+                           ItemContainerStyle="{TemplateBinding TimeListItemsStyle}">
                   </ListBox>
                 </Grid>
               </Border>
@@ -277,6 +239,9 @@
                      Value="False">
               <Setter Property="Foreground"
                       Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+              <Setter TargetName="_timePickerToggleButton"
+                      Property="Content"
+                      Value="{Binding DropDownButtonDisabledContent, RelativeSource={RelativeSource TemplatedParent}}" />
             </Trigger>
             <Trigger Property="IsFocused"
                      Value="True">

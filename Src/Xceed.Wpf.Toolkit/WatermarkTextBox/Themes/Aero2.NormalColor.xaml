@@ -87,7 +87,8 @@
                     Background="{TemplateBinding Background}">
               <Grid>
                 <ScrollViewer x:Name="PART_ContentHost"
-                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                              InputScope="{TemplateBinding InputScope}">
                 </ScrollViewer>
                 <ContentPresenter x:Name="PART_WatermarkHost"
                                   Content="{TemplateBinding Watermark}"

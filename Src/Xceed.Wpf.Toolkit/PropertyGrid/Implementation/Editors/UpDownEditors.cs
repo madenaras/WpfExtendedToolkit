@@ -2,10 +2,11 @@
    
    Toolkit for WPF
 
-   Copyright (C) 2007-2019 Xceed Software Inc.
+   Copyright (C) 2007-2025 Xceed Software Inc.
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md
+   This program is provided to you under the terms of the XCEED SOFTWARE, INC.
+   COMMUNITY LICENSE AGREEMENT (for non-commercial use) as published at 
+   https://github.com/xceedsoftware/wpftoolkit/blob/master/license.md 
 
    For more features, controls, and fast professional support,
    pick up the Plus Edition at https://xceed.com/xceed-toolkit-plus-for-wpf/
@@ -27,10 +28,6 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class UpDownEditor<TEditor, TType> : TypeEditor<TEditor> where TEditor : UpDownBase<TType>, new()
   {
-    protected override void SetControlProperties( PropertyItem propertyItem )
-    {
-      Editor.TextAlignment = System.Windows.TextAlignment.Left;
-    }
     protected override void SetValueDependencyProperty()
     {
       ValueProperty = UpDownBase<TType>.ValueProperty;
@@ -45,8 +42,8 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       var rangeAttribute = PropertyGridUtilities.GetAttribute<RangeAttribute>( propertyDescriptor );
       if( rangeAttribute != null )
       {
-        Editor.Maximum = ((TType)converter.ConvertFrom( rangeAttribute.Maximum.ToString() ));
-        Editor.Minimum = ((TType)converter.ConvertFrom( rangeAttribute.Minimum.ToString() ));
+        Editor.Maximum = ( ( TType )converter.ConvertFrom( rangeAttribute.Maximum.ToString() ) );
+        Editor.Minimum = ( ( TType )converter.ConvertFrom( rangeAttribute.Minimum.ToString() ) );
       }
     }
 #endif
@@ -98,7 +95,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     }
   }
 
-  public class DoubleUpDownEditor : NumericUpDownEditor<DoubleUpDown, double?> 
+  public class DoubleUpDownEditor : NumericUpDownEditor<DoubleUpDown, double?>
   {
     protected override DoubleUpDown CreateEditor()
     {
@@ -111,7 +108,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       Editor.AllowInputSpecialValues = AllowedSpecialValues.Any;
 
 #if !VS2008
-      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( double ) ) );      
+      this.SetMinMaxFromRangeAttribute( propertyItem.PropertyDescriptor, TypeDescriptor.GetConverter( typeof( double ) ) );
 #endif
     }
   }
@@ -164,7 +161,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     }
   }
 
-  public class SingleUpDownEditor : NumericUpDownEditor<SingleUpDown, float?> 
+  public class SingleUpDownEditor : NumericUpDownEditor<SingleUpDown, float?>
   {
     protected override SingleUpDown CreateEditor()
     {

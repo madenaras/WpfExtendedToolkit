@@ -23,6 +23,8 @@ using System.Windows.Media;
 using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Threading;
+
 
 namespace Xceed.Wpf.Toolkit
 {
@@ -126,9 +128,12 @@ namespace Xceed.Wpf.Toolkit
       ListCollectionView lcv = ( ListCollectionView )( CollectionViewSource.GetDefaultView( this.AvailableColors ) );
       if( lcv != null )
       {
-        lcv.CustomSort = ( AvailableColorsSortingMode == ColorSortingMode.HueSaturationBrightness )
-                          ? new ColorSorter()
-                          : null;
+        this.Dispatcher.BeginInvoke( DispatcherPriority.Input, new Action( () =>
+        {
+          lcv.CustomSort = ( AvailableColorsSortingMode == ColorSortingMode.HueSaturationBrightness )
+                            ? new ColorSorter()
+                            : null;
+        } ) );
       }
     }
 
@@ -235,6 +240,40 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //DropDownBackground
+
+    #region DropDownBorderBrush
+
+    public static readonly DependencyProperty DropDownBorderBrushProperty = DependencyProperty.Register( "DropDownBorderBrush", typeof( Brush ), typeof( ColorPicker ), new UIPropertyMetadata( null ) );
+    public Brush DropDownBorderBrush
+    {
+      get
+      {
+        return ( Brush )GetValue( DropDownBorderBrushProperty );
+      }
+      set
+      {
+        SetValue( DropDownBorderBrushProperty, value );
+      }
+    }
+
+    #endregion //DropDownBorderBrush
+
+    #region DropDownBorderThickness
+
+    public static readonly DependencyProperty DropDownBorderThicknessProperty = DependencyProperty.Register( "DropDownBorderThickness", typeof( Thickness ), typeof( ColorPicker ), new UIPropertyMetadata( null ) );
+    public Thickness DropDownBorderThickness
+    {
+      get
+      {
+        return ( Thickness )GetValue( DropDownBorderThicknessProperty );
+      }
+      set
+      {
+        SetValue( DropDownBorderThicknessProperty, value );
+      }
+    }
+
+    #endregion //DropDownBorderBrush
 
     #region HeaderBackground
 
@@ -628,6 +667,8 @@ namespace Xceed.Wpf.Toolkit
 
     public ColorPicker()
     {
+
+      Core.Message.ShowMessage();
 
 #if VS2008
         this.RecentColors = new ObservableCollection<ColorItem>();

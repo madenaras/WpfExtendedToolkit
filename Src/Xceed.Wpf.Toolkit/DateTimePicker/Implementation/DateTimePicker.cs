@@ -17,10 +17,13 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Controls.Primitives;
-using Xceed.Wpf.Toolkit.Core.Utilities;
+using System.Windows.Input;
+using System.Windows.Markup;
+using System.Windows.Shapes;
 using Xceed.Wpf.Toolkit.Primitives;
+using System.Diagnostics;
+using System.Windows.Media;
 #if VS2008
 using Microsoft.Windows.Controls;
 using Microsoft.Windows.Controls.Primitives;
@@ -41,6 +44,7 @@ namespace Xceed.Wpf.Toolkit
     private TimePicker _timePicker;
     private DateTime? _calendarTemporaryDateTime;
     private DateTime? _calendarIntendedDateTime;
+    private bool _isModifyingCalendarInternally;
 
     #endregion //Members
 
@@ -62,6 +66,23 @@ namespace Xceed.Wpf.Toolkit
     }
 
     #endregion //AutoCloseCalendar
+
+    #region AutoCloseCalendarOnTimeSelection 
+
+    public static readonly DependencyProperty AutoCloseCalendarOnTimeSelectionProperty = DependencyProperty.Register( "AutoCloseCalendarOnTimeSelection", typeof( bool ), typeof( DateTimePicker ), new UIPropertyMetadata( false ) );
+    public bool AutoCloseCalendarOnTimeSelection
+    {
+      get
+      {
+        return ( bool )GetValue( AutoCloseCalendarOnTimeSelectionProperty );
+      }
+      set
+      {
+        SetValue( AutoCloseCalendarOnTimeSelectionProperty, value );
+      }
+    }
+
+    #endregion //AutoCloseCalendarOnTimeSelection
 
     #region CalendarDisplayMode
 
@@ -155,6 +176,35 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //TimePickerAllowSpin
 
+    #region TimePickerTimeListItemsStyle
+
+    public static readonly DependencyProperty TimePickerTimeListItemsStyleProperty = DependencyProperty.Register( "TimePickerTimeListItemsStyle", typeof( Style ), typeof( DateTimePicker ),
+            new FrameworkPropertyMetadata( ( Style )null, new PropertyChangedCallback( OnTimePickerTimeListItemsStyleChanged ) ) );
+
+    public Style TimePickerTimeListItemsStyle
+    {
+      get
+      {
+        return ( Style )GetValue( TimePickerTimeListItemsStyleProperty );
+      }
+      set
+      {
+        SetValue( TimePickerTimeListItemsStyleProperty, value );
+      }
+    }
+
+    private static void OnTimePickerTimeListItemsStyleChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+    {
+      ( ( DateTimePicker )d ).OnTimePickerTimeListItemsStyleChanged( e );
+    }
+
+    protected virtual void OnTimePickerTimeListItemsStyleChanged( DependencyPropertyChangedEventArgs e )
+    {
+      // TODO: Add your property changed side-effects. Descendants can override as well.
+    }
+
+    #endregion
+
     #region TimePickerShowButtonSpinner
 
     public static readonly DependencyProperty TimePickerShowButtonSpinnerProperty = DependencyProperty.Register( "TimePickerShowButtonSpinner", typeof( bool ), typeof( DateTimePicker ), new UIPropertyMetadata( true ) );
@@ -235,6 +285,8 @@ namespace Xceed.Wpf.Toolkit
 
     public DateTimePicker()
     {
+
+      Core.Message.ShowMessage();
     }
 
     #endregion //Constructors
@@ -246,13 +298,18 @@ namespace Xceed.Wpf.Toolkit
       base.OnApplyTemplate();
 
       if( _calendar != null )
-        _calendar.SelectedDatesChanged -= Calendar_SelectedDatesChanged;
+      {
+        _calendar.SelectedDatesChanged -= this.Calendar_SelectedDatesChanged;
+        _calendar.MouseDoubleClick -= this.Calendar_MouseDoubleClick;
+      }
 
       _calendar = GetTemplateChild( PART_Calendar ) as Calendar;
 
       if( _calendar != null )
       {
-        _calendar.SelectedDatesChanged += Calendar_SelectedDatesChanged;
+        _calendar.Language = XmlLanguage.GetLanguage( System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag );
+        _calendar.SelectedDatesChanged += this.Calendar_SelectedDatesChanged;
+        _calendar.MouseDoubleClick += this.Calendar_MouseDoubleClick;
         _calendar.SelectedDate = Value ?? null;
         _calendar.DisplayDate = Value ?? this.ContextNow;
         this.SetBlackOutDates();
@@ -271,36 +328,39 @@ namespace Xceed.Wpf.Toolkit
 
     protected override void OnPreviewMouseUp( MouseButtonEventArgs e )
     {
-      if( Mouse.Captured is CalendarItem)
+      if( Mouse.Captured is CalendarItem )
       {
         Mouse.Capture( null );
 
         // Do not close calendar on Year/Month Selection. Close only on Day selection.
-        if( AutoCloseCalendar && (_calendar != null) && ( _calendar.DisplayMode == CalendarMode.Month ) )
+        if( AutoCloseCalendar && ( _calendar != null ) && ( _calendar.DisplayMode == CalendarMode.Month ) )
         {
           ClosePopup( true );
         }
       }
+
       base.OnPreviewMouseUp( e );
     }
 
     protected override void OnValueChanged( DateTime? oldValue, DateTime? newValue )
     {
       //The calendar only select the Date part, not the time part.
-      //Pull request : the time part is important if we want to initialise the calendar with the current day and another hour 
-      DateTime? newValueDate = (newValue != null)  ? newValue.Value : (DateTime?)null;
+      DateTime? newValueDate = ( newValue != null )
+        ? newValue.Value.Date
+        : ( DateTime? )null;
 
-      if( _calendar != null && _calendar.SelectedDate != newValueDate)
+      if( _calendar != null && _calendar.SelectedDate != newValueDate )
       {
+        _isModifyingCalendarInternally = true;
         _calendar.SelectedDate = newValueDate;
         _calendar.DisplayDate = newValue.GetValueOrDefault( this.ContextNow );
-
+        _isModifyingCalendarInternally = false;
       }
 
       //If we change any part of the datetime without
       //using the calendar when the actual date is temporary,
       //clear the temporary value. 
-      if( (_calendar != null) && (_calendarTemporaryDateTime != null) && (newValue != _calendarTemporaryDateTime ))
+      if( ( _calendar != null ) && ( _calendarTemporaryDateTime != null ) && ( newValue != _calendarTemporaryDateTime ) )
       {
         _calendarTemporaryDateTime = null;
         _calendarIntendedDateTime = null;
@@ -349,6 +409,33 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Base Class Overrides
 
+    #region Command Hanlders
+
+
+
+    #endregion // Command Handlers
+
+    #region Events
+
+    #region Today Event
+
+    public static readonly RoutedEvent TodayEvent = EventManager.RegisterRoutedEvent( "Today", RoutingStrategy.Bubble, typeof( EventHandler ), typeof( DateTimePicker ) );
+    public event RoutedEventHandler Today
+    {
+      add
+      {
+        AddHandler( TodayEvent, value );
+      }
+      remove
+      {
+        RemoveHandler( TodayEvent, value );
+      }
+    }
+
+    #endregion //Today Event
+
+    #endregion // Events
+
     #region Event Handlers
 
     protected override void HandleKeyDown( object sender, KeyEventArgs e )
@@ -385,6 +472,17 @@ namespace Xceed.Wpf.Toolkit
           _fireSelectionChangedEvent = true;
         }
       }
+
+      // Do not close calendar on Year/Month Selection. Close only on Day selection.
+      if( ( _timePicker != null )
+        && _timePicker.IsOpen
+        && this.AutoCloseCalendarOnTimeSelection 
+        && ( _calendar != null ) 
+        && ( _calendar.DisplayMode == CalendarMode.Month ) )
+      {
+        Mouse.Capture( null );
+        this.ClosePopup( true );
+      }
     }
 
     private void Calendar_SelectedDatesChanged( object sender, SelectionChangedEventArgs e )
@@ -406,17 +504,16 @@ namespace Xceed.Wpf.Toolkit
             newDate = newDate.Value.Date + _calendarIntendedDateTime.Value.TimeOfDay;
             _calendarTemporaryDateTime = null;
             _calendarIntendedDateTime = null;
-          } 
-        //Pull request : the value should be used first. The Tempvalue should be a fallback 
+          }
+          else if( ( _timePicker != null ) && _timePicker.TempValue.HasValue )
+          {
+            newDate = newDate.Value.Date + _timePicker.TempValue.Value.TimeOfDay;
+          }
           else if( Value != null )
           {
             newDate = newDate.Value.Date + Value.Value.TimeOfDay;
           }
-          else if( ( _timePicker != null ) && _timePicker.TempValue.HasValue ) // bug
-          {
-            newDate = newDate.Value.Date + _timePicker.TempValue.Value.TimeOfDay;
-          }
-        
+
           // Always be sure that the time part of the selected value is always 
           // within the bound of the min max. The time part could be altered
           // if the calendar's selected date match the Minimum or Maximum date.
@@ -445,11 +542,20 @@ namespace Xceed.Wpf.Toolkit
         //}
         //else
         //{
-          if( !object.Equals( newDate, Value ) )
-          {
-            this.Value = newDate;
-          }
+        if( !_isModifyingCalendarInternally && !object.Equals( newDate, Value ) )
+        {
+          this.Value = newDate;
+        }
         //}
+      }
+    }
+
+    private void Calendar_MouseDoubleClick( object sender, MouseButtonEventArgs e )
+    {
+      var source = e.OriginalSource as Shape;
+      if( ( source != null ) && ( source.TemplatedParent is CalendarDayButton ) )
+      {
+        this.ClosePopup( true );
       }
     }
 
@@ -481,12 +587,12 @@ namespace Xceed.Wpf.Toolkit
       {
         _calendar.BlackoutDates.Clear();
 
-        if( ( this.Minimum != null ) && this.Minimum.HasValue && ( this.Minimum.Value != System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MinSupportedDateTime ) )
+        if( ( this.Minimum != null ) && this.Minimum.HasValue && ( this.Minimum.Value >= System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MinSupportedDateTime.AddDays( 1 ) ) )
         {
           DateTime minDate = this.Minimum.Value;
           _calendar.BlackoutDates.Add( new CalendarDateRange( System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MinSupportedDateTime, minDate.AddDays( -1 ) ) );
         }
-        if( ( this.Maximum != null ) && this.Maximum.HasValue && ( this.Maximum.Value != System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MaxSupportedDateTime ) )
+        if( ( this.Maximum != null ) && this.Maximum.HasValue && ( this.Maximum.Value <= System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MaxSupportedDateTime.AddDays( -1 ) ) )
         {
           DateTime maxDate = this.Maximum.Value;
           _calendar.BlackoutDates.Add( new CalendarDateRange( maxDate.AddDays( 1 ), System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.Calendar.MaxSupportedDateTime ) );

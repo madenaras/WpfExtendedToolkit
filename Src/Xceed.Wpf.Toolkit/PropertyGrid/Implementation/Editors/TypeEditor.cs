@@ -75,6 +75,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
     protected virtual void SetControlProperties( PropertyItem propertyItem )
     {
       //TODO: implement in derived class
+      // Do not set Editor properties which could not be overriden in a user style.
     }
 
     protected abstract void SetValueDependencyProperty();

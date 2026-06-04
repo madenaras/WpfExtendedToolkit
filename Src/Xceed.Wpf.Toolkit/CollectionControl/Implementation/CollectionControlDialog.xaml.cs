@@ -18,14 +18,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows;
-using System.Windows.Media;
-using Xceed.Wpf.Toolkit.Core.Utilities;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Security;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 
 namespace Xceed.Wpf.Toolkit
@@ -35,9 +35,6 @@ namespace Xceed.Wpf.Toolkit
   {
   }
 
-  /// <summary>
-  /// Interaction logic for CollectionControlDialog.xaml
-  /// </summary>
   public partial class CollectionControlDialog : CollectionControlDialogBase
   {
     #region Private Members
@@ -199,9 +196,9 @@ namespace Xceed.Wpf.Toolkit
       object result = null;
       var sourceType = source.GetType();
 
-      if( source is Array array)
+      if( source is Array )
       {
-        result = array.Clone();
+        result = ( source as Array ).Clone();
       }
       // For IDictionary, we need to create EditableKeyValuePair to edit the Key-Value.
       else if( ( this.ItemsSource is IDictionary )
@@ -234,67 +231,37 @@ namespace Xceed.Wpf.Toolkit
       Debug.Assert( result != null );
       if( result != null )
       {
-        var properties = sourceType.GetProperties();
+        PropertyInfo[] propertyInfos = typeof( ICollection ).IsAssignableFrom( sourceType )
+                                       ? sourceType.GetProperties( BindingFlags.Instance | BindingFlags.Public )
+                                       : sourceType.GetProperties( BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly );
 
-        foreach( var propertyInfo in properties )
+        foreach( var propertyInfo in propertyInfos )
         {
           try
           {
-            var parameters = propertyInfo.GetIndexParameters();
-            var index = parameters.GetLength( 0 ) == 0 ? null : new object[] { parameters.GetLength( 0 ) - 1 };
-            var propertyInfoValue = propertyInfo.GetValue( source, index );
-
             if( propertyInfo.CanWrite )
             {
-              // Look for nested object
-              if( propertyInfo.PropertyType.IsClass
-                && ( propertyInfo.PropertyType != typeof( Transform ) )
-                && !propertyInfo.PropertyType.Equals( typeof( string ) ) )
+              var parameters = propertyInfo.GetIndexParameters();
+              var isIndexed = ( parameters.GetLength( 0 ) != 0 );
+              if( !isIndexed )
               {
-                // We have a Collection/List of T.
-                if( propertyInfo.PropertyType.IsGenericType )
-                {
-                  // Clone sub-objects if the T are non-primitive types objects. 
-                  var arg = propertyInfo.PropertyType.GetGenericArguments().FirstOrDefault();
-                  if( ( arg != null ) && !arg.IsPrimitive && !arg.Equals( typeof( String ) ) && !arg.IsEnum )
-                  {
-                    var nestedObject = this.Clone( propertyInfoValue );
-                    propertyInfo.SetValue( result, nestedObject, null );
-                  }
-                  else
-                  {
-                    // copy object if the T are primitive types objects.
-                    propertyInfo.SetValue( result, propertyInfoValue, null );
-                  }
-                }
-                else
-                {
-                  var nestedObject = this.Clone( propertyInfoValue );
-                  if( nestedObject != null )
-                  {
-                    // For T object included in List/Collections, Add it to the List/Collection of T.
-                    if( index != null )
-                    {
-                      result.GetType().GetMethod( "Add" ).Invoke( result, new[] { nestedObject } );
-                    }
-                    else
-                    {
-                      propertyInfo.SetValue( result, nestedObject, null );
-                    }
-                  }
-                }
+                var propertyInfoValue = propertyInfo.GetValue( source, null );
+                this.GenerateValue( propertyInfo, propertyInfoValue, result );
               }
               else
               {
-                // For T object included in List/Collections, Add it to the List/Collection of T.
-                if( index != null )
+                var countPropertyInfo = sourceType.GetProperty( "Count" );
+                if( countPropertyInfo != null )
                 {
-                  result.GetType().GetMethod( "Add" ).Invoke( result, new[] { propertyInfoValue } );
-                }
-                else
-                {
-                  // copy regular object
-                  propertyInfo.SetValue( result, propertyInfoValue, null );
+                  var count = countPropertyInfo.GetValue( source, null ) as int?;
+                  if( ( count != null ) && count.HasValue )
+                  {
+                    for( int i = 0; i < count.Value; ++i )
+                    {
+                      var propertyInfoValue = propertyInfo.GetValue( source, new object[] { i } );
+                      this.GenerateValue( propertyInfo, propertyInfoValue, result, true );
+                    }
+                  }
                 }
               }
             }
@@ -306,6 +273,82 @@ namespace Xceed.Wpf.Toolkit
       }
 
       return result;
+    }
+
+    private void GenerateValue( PropertyInfo propertyInfo, object propertyInfoValue, object result, bool isIndexed = false )
+    {
+      if( this.IsCyclingDependency( propertyInfoValue ) )
+        return;
+
+      // Look for nested object
+      if( propertyInfo.PropertyType.IsClass
+        && ( propertyInfo.PropertyType != typeof( Transform ) )
+        && ( propertyInfo.PropertyType != typeof( ControlTemplate ) )
+        && !propertyInfo.PropertyType.Equals( typeof( string ) ) )
+      {
+        // We have a Collection/List of T.
+        if( propertyInfo.PropertyType.IsGenericType )
+        {
+          // Clone sub-objects if the T are non-primitive types objects. 
+          var arg = propertyInfo.PropertyType.GetGenericArguments().FirstOrDefault();
+          if( ( arg != null ) && !arg.IsPrimitive && !arg.Equals( typeof( String ) ) && !arg.IsEnum )
+          {
+            var nestedObject = this.Clone( propertyInfoValue );
+            propertyInfo.SetValue( result, nestedObject, null );
+          }
+          else
+          {
+            // copy object if the T are primitive types objects.
+            propertyInfo.SetValue( result, propertyInfoValue, null );
+          }
+        }
+        else
+        {
+          var nestedObject = this.Clone( propertyInfoValue );
+          if( nestedObject != null )
+          {
+            // For T object included in List/Collections, Add it to the List/Collection of T.
+            if( isIndexed )
+            {
+              result.GetType().GetMethod( "Add" ).Invoke( result, new[] { nestedObject } );
+            }
+            else
+            {
+              propertyInfo.SetValue( result, nestedObject, null );
+            }
+          }
+        }
+      }
+      else
+      {
+        // For T object included in List/Collections, Add it to the List/Collection of T.
+        if( isIndexed )
+        {
+          result.GetType().GetMethod( "Add" ).Invoke( result, new[] { propertyInfoValue } );
+        }
+        else
+        {
+          // copy regular object
+          propertyInfo.SetValue( result, propertyInfoValue, null );
+        }
+      }
+    }
+
+    private bool IsCyclingDependency( object propertyInfoValue )
+    {
+      if( propertyInfoValue == null )
+        return false;
+
+      if( object.ReferenceEquals( propertyInfoValue, this.ItemsSource ) )
+        return true;
+
+      foreach( var item in this.ItemsSource )
+      {
+        if( object.ReferenceEquals( propertyInfoValue, item ) )
+          return true;
+      }
+
+      return false;
     }
 
     private object GenerateEditableKeyValuePair( object source )

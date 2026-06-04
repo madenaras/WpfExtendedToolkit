@@ -206,6 +206,9 @@ namespace Xceed.Wpf.Toolkit
 
     public MultiLineTextEditor()
     {
+
+      Core.Message.ShowMessage();
+
       Keyboard.AddKeyDownHandler( this, OnKeyDown );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );
     }

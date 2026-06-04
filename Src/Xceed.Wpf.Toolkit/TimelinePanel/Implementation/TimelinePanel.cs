@@ -203,6 +203,8 @@ namespace Xceed.Wpf.Toolkit
 
     public TimelinePanel()
     {
+
+      Core.Message.ShowMessage();
     }
 
     #endregion //Constructors
@@ -554,7 +556,7 @@ namespace Xceed.Wpf.Toolkit
 
               break;
 
-              #endregion
+            #endregion
 
             //---------------------------------------------------------------------
             //

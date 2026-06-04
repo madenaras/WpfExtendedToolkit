@@ -15,21 +15,20 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using Xceed.Wpf.Toolkit.Core.Utilities;
-using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
-using System.Collections;
-using System.Collections.ObjectModel;
-using System.Windows.Controls.Primitives;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using System.Windows.Controls;
+using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid
 {
@@ -473,8 +472,13 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
       if( editorElement == null )
       {
-        if( propertyItem.IsReadOnly )
-          editor = new TextBlockEditor();
+        if( propertyItem.IsReadOnly
+          && !ListUtilities.IsListOfItems( propertyItem.PropertyType )
+          && !ListUtilities.IsCollectionOfItems( propertyItem.PropertyType )
+          && !ListUtilities.IsDictionaryOfItems( propertyItem.PropertyType ) )
+        {
+          editor = new TextBlockEditor( ( propertyItem.PropertyDescriptor != null ) ? propertyItem.PropertyDescriptor.Converter : null );
+        }
 
         // Fallback: Use a default type editor.
         if( editor == null )

@@ -15,10 +15,9 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
+using System.Windows;
 using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit.Converters
@@ -26,7 +25,14 @@ namespace Xceed.Wpf.Toolkit.Converters
   public class ProgressBarWidthConverter : IMultiValueConverter
   {
     public object Convert( object[] values, Type targetType, object parameter, CultureInfo culture )
-    { 
+    {
+      if( ( values.Count() != 2 )
+        || ( values[ 0 ] == DependencyProperty.UnsetValue )
+        || ( values[ 1 ] == DependencyProperty.UnsetValue ) )
+      {
+        return 0;
+      }
+
       var contentWidth = ( double )values[ 0 ];
       var parentMinWidth = ( double )values[ 1 ];
 

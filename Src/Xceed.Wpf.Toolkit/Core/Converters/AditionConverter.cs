@@ -15,10 +15,7 @@
   ***********************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit.Core.Converters
@@ -29,7 +26,7 @@ namespace Xceed.Wpf.Toolkit.Core.Converters
     {
       if( ( value != null ) && ( parameter != null ) )
       {
-        var firstValue = ( double )value;
+        var firstValue = System.Convert.ToDouble( value );
         var secondValue = double.Parse( parameter as string );
 
         return firstValue + secondValue;

@@ -21,11 +21,20 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using Xceed.Wpf.Toolkit.Core;
+using System.ComponentModel;
+using System.Windows.Media;
+using System.Windows.Data;
 
 namespace Xceed.Wpf.Toolkit
 {
   public class Wizard : ItemsControl
   {
+    #region Private Members
+
+    private bool? _dialogResult = null;
+
+    #endregion
+
     #region Properties
 
     public static readonly DependencyProperty BackButtonContentProperty = DependencyProperty.Register( "BackButtonContent", typeof( object ), typeof( Wizard ), new UIPropertyMetadata( "< Back" ) );
@@ -182,7 +191,29 @@ namespace Xceed.Wpf.Toolkit
 
     protected virtual void OnCurrentPageChanged( WizardPage oldValue, WizardPage newValue )
     {
-      RaiseRoutedEvent( Wizard.PageChangedEvent );
+      // Re-evaluate all binding errors for the new page.
+      if( (newValue != null) && newValue.Content is DependencyObject dependencyObject )
+      {
+        for( var i = 0; i < VisualTreeHelper.GetChildrenCount( dependencyObject ); i++ )
+        {
+          var childVisual = VisualTreeHelper.GetChild( dependencyObject, i );
+
+          var localPropertyValues = childVisual.GetLocalValueEnumerator();
+          while( localPropertyValues.MoveNext() )
+          {
+            if( localPropertyValues.Current.Value is BindingExpression bindingExpression )
+            {
+              if( bindingExpression.HasError )
+              {
+                Validation.ClearInvalid( bindingExpression );
+                bindingExpression.UpdateSource();
+              }
+            }
+          }
+        }
+      }
+
+      this.RaiseRoutedEvent( Wizard.PageChangedEvent );
     }
 
     #endregion //CurrentPage
@@ -303,6 +334,9 @@ namespace Xceed.Wpf.Toolkit
 
     public Wizard()
     {
+
+      Core.Message.ShowMessage();
+
       CommandBindings.Add( new CommandBinding( WizardCommands.Cancel, ExecuteCancelWizard, CanExecuteCancelWizard ) );
       CommandBindings.Add( new CommandBinding( WizardCommands.Finish, ExecuteFinishWizard, CanExecuteFinishWizard ) );
       CommandBindings.Add( new CommandBinding( WizardCommands.Help, ExecuteRequestHelp, CanExecuteRequestHelp ) );
@@ -342,8 +376,10 @@ namespace Xceed.Wpf.Toolkit
           throw new NotSupportedException( "Wizard should only contain WizardPages." );
       }
 
-      if( Items.Count > 0 && CurrentPage == null )
-        CurrentPage = Items[ 0 ] as WizardPage;
+      if( this.Items.Count > 0 && this.CurrentPage == null )
+      {
+        this.SetCurrentValue( Wizard.CurrentPageProperty, this.Items[ 0 ] as WizardPage );
+      }
     }
 
     protected override void OnPropertyChanged( DependencyPropertyChangedEventArgs e )
@@ -579,14 +615,7 @@ namespace Xceed.Wpf.Toolkit
 
     public delegate void NextRoutedEventHandler( object sender, CancelRoutedEventArgs e );
 
-    /// <summary>
-    /// Identifies the Next routed event.
-    /// </summary>
     public static readonly RoutedEvent NextEvent = EventManager.RegisterRoutedEvent( "Next", RoutingStrategy.Bubble, typeof( NextRoutedEventHandler ), typeof( Wizard ) );
-    /// <summary>
-    /// Raised when WizardCommands.NextPage command is executed.
-    /// This cancellable event can prevent the command execution from continuing.
-    /// </summary>
     public event NextRoutedEventHandler Next
     {
       add
@@ -605,14 +634,7 @@ namespace Xceed.Wpf.Toolkit
 
     public delegate void PreviousRoutedEventHandler( object sender, CancelRoutedEventArgs e );
 
-    /// <summary>
-    /// Identifies the Previous routed event.
-    /// </summary>
     public static readonly RoutedEvent PreviousEvent = EventManager.RegisterRoutedEvent( "Previous", RoutingStrategy.Bubble, typeof( PreviousRoutedEventHandler ), typeof( Wizard ) );
-    /// <summary>
-    /// Raised when WizardCommands.PreviousPage command is executed.
-    /// This cancellable event can prevent the command execution from continuing.
-    /// </summary>
     public event PreviousRoutedEventHandler Previous
     {
       add
@@ -638,9 +660,30 @@ namespace Xceed.Wpf.Toolkit
       {
         //we can only set the DialogResult if the window was opened as modal with the ShowDialog() method. Otherwise an exception would occur
         if( ComponentDispatcher.IsThreadModal )
-          window.DialogResult = dialogResult;
+        {
+          _dialogResult = dialogResult;
+          window.Closing += this.Window_Closing;
+        }
 
         window.Close();
+      }
+    }
+
+    private void Window_Closing( object sender, CancelEventArgs e )
+    {
+      var window = sender as Window;
+
+      if( window != null )
+      {
+        if( !e.Cancel )
+        {
+          // Set dialog result only when closing is not canceled.
+          window.DialogResult = _dialogResult;
+        }
+
+        _dialogResult = null;
+
+        window.Closing -= this.Window_Closing;
       }
     }
 

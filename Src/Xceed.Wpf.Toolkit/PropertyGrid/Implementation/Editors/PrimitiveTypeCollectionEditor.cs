@@ -14,20 +14,12 @@
 
   ***********************************************************************************/
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 
 namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
 {
   public class PrimitiveTypeCollectionEditor : TypeEditor<PrimitiveTypeCollectionControl>
   {
-    protected override void SetControlProperties( PropertyItem propertyItem )
-    {
-      Editor.BorderThickness = new System.Windows.Thickness( 0 );
-      Editor.Content = "(Collection)";
-    }
-
     protected override void SetValueDependencyProperty()
     {
       ValueProperty = PrimitiveTypeCollectionControl.ItemsSourceProperty;
@@ -43,12 +35,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid.Editors
       var type = propertyItem.PropertyType;
       Editor.ItemsSourceType = type;
 
-      var icollection = propertyItem.PropertyType.GetInterfaces().FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ICollection<>));
-      if (icollection != null)
-      {
-        Editor.ItemType = icollection.GetGenericArguments()[0];
-      }
-      else if ( type.BaseType == typeof( System.Array ) )
+      if( type.BaseType == typeof( System.Array ) )
       {
         Editor.ItemType = type.GetElementType();
       }

@@ -19,8 +19,11 @@
                     xmlns:core="clr-namespace:Xceed.Wpf.Toolkit.Core">
 
    <ResourceDictionary.MergedDictionaries>
-    <core:VersionResourceDictionary AssemblyName="DotNetProjects.Wpf.Extended.Toolkit" SourcePath="Themes/Aero/Brushes_NormalColor.xaml"/>
-    <core:VersionResourceDictionary AssemblyName="DotNetProjects.Wpf.Extended.Toolkit" SourcePath="Themes/Aero/Buttons_NormalColor.xaml"/>
+     <!-- core:VersionResourceDictionary will take care of modifying the value of 'AssemblyName' to match
+          the real name of the assembly when compiled for other platforms, like .NET Core for example. -->
+      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit" SourcePath="Themes/Aero/Brushes_NormalColor.xaml"/>
+      <core:VersionResourceDictionary AssemblyName="Xceed.Wpf.Toolkit"
+                                      SourcePath="Themes/Aero/Buttons_NormalColor.xaml"/>
    </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

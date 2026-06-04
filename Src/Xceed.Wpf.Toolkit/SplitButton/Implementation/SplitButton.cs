@@ -33,6 +33,39 @@ namespace Xceed.Wpf.Toolkit
 
     #endregion //Constructors
 
+    #region Properties
+
+    #region DropDownContent
+
+    public static readonly DependencyProperty DropDownTooltipProperty = DependencyProperty.Register( "DropDownTooltip", typeof( object ), typeof( SplitButton ), new UIPropertyMetadata( null, OnDropDownTooltipChanged ) );
+    public object DropDownTooltip
+    {
+      get
+      {
+        return ( object )GetValue( DropDownTooltipProperty );
+      }
+      set
+      {
+        SetValue( DropDownTooltipProperty, value );
+      }
+    }
+
+    private static void OnDropDownTooltipChanged( DependencyObject o, DependencyPropertyChangedEventArgs e )
+    {
+      var splitButton = o as SplitButton;
+      if( splitButton != null )
+        splitButton.OnDropDownTooltipChanged( ( object )e.OldValue, ( object )e.NewValue );
+    }
+
+    protected virtual void OnDropDownTooltipChanged( object oldValue, object newValue )
+    {
+      // TODO: Add your property changed side-effects. Descendants can override as well.
+    }
+
+    #endregion //DropDownTooltip
+
+    #endregion
+
     #region Base Class Overrides
 
     public override void OnApplyTemplate()

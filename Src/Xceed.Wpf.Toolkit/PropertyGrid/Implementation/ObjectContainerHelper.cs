@@ -120,14 +120,16 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private PropertyItem CreatePropertyItem( PropertyDescriptor property, PropertyDefinition propertyDef )
     {
-      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property, SelectedObject, this.PropertyContainer );                                                                                 
+      DescriptorPropertyDefinition definition = new DescriptorPropertyDefinition( property, SelectedObject, this.PropertyContainer );
       definition.InitProperties();
+
+      var categoryValue = definition.CategoryValue;
 
       this.InitializeDescriptorDefinition( definition, propertyDef );
       PropertyItem propertyItem = new PropertyItem( definition );
       Debug.Assert( SelectedObject != null );
       propertyItem.Instance = SelectedObject;
-      propertyItem.CategoryOrder = this.GetCategoryOrder( definition.CategoryValue );
+      propertyItem.CategoryOrder = this.GetCategoryOrder( categoryValue );
 
       propertyItem.WillRefreshPropertyGrid = this.GetWillRefreshPropertyGrid( property );
       return propertyItem;
@@ -135,19 +137,15 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
 
     private int GetCategoryOrder( object categoryValue )
     {
-      Debug.Assert( SelectedObject != null );
+      Debug.Assert( this.SelectedObject != null );
 
       if( categoryValue == null )
         return int.MaxValue;
 
       int order = int.MaxValue;
-        object selectedObject = SelectedObject;
-        CategoryOrderAttribute[] orderAttributes = ( selectedObject != null )
-          ? ( CategoryOrderAttribute[] )selectedObject.GetType().GetCustomAttributes( typeof( CategoryOrderAttribute ), true )
-          : new CategoryOrderAttribute[ 0 ];
-
-        var orderAttribute = orderAttributes
-          .FirstOrDefault( ( a ) => object.Equals( a.CategoryValue, categoryValue ) );
+        var orderAttribute = TypeDescriptor.GetAttributes( this.SelectedObject )
+                                .OfType<CategoryOrderAttribute>()
+                                .FirstOrDefault( attribute => Equals( attribute.CategoryValue, categoryValue ) );
 
         if( orderAttribute != null )
         {

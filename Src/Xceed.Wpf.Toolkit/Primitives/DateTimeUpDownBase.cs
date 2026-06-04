@@ -17,12 +17,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Xceed.Wpf.Toolkit.Primitives;
 
 namespace Xceed.Wpf.Toolkit.Primitives
 {
@@ -42,7 +40,21 @@ namespace Xceed.Wpf.Toolkit.Primitives
     #region CurrentDateTimePart
 
     public static readonly DependencyProperty CurrentDateTimePartProperty = DependencyProperty.Register( "CurrentDateTimePart", typeof( DateTimePart )
-      , typeof( DateTimeUpDownBase<T> ), new UIPropertyMetadata( DateTimePart.Other, OnCurrentDateTimePartChanged ) );
+      , typeof( DateTimeUpDownBase<T> ), new UIPropertyMetadata( DateTimePart.Other, OnCurrentDateTimePartChanged, OnCurrentDateTimePartCoerce ) );
+
+    private static object OnCurrentDateTimePartCoerce( DependencyObject d, object baseValue )
+    {
+      DateTimeUpDownBase<T> dateTimeUpDownBase = d as DateTimeUpDownBase<T>;
+      if( dateTimeUpDownBase != null )
+        return dateTimeUpDownBase.OnCurrentDateTimePartCoerce( baseValue );
+      return baseValue;
+    }
+
+    protected virtual object OnCurrentDateTimePartCoerce( object baseValue )
+    {
+      return baseValue;
+    }
+
     public DateTimePart CurrentDateTimePart
     {
       get
@@ -146,7 +158,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
             return;
           }
         case Key.Add:
-          if( this.AllowSpin && !this.IsReadOnly )
+          if( this.AllowSpin && !this.AllowTextInput && !this.IsReadOnly )
           {
             this.DoIncrement();
             e.Handled = true;
@@ -154,7 +166,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
           _fireSelectionChangedEvent = false;
           break;
         case Key.Subtract:
-          if( this.AllowSpin && !this.IsReadOnly )
+          if( this.AllowSpin && !this.AllowTextInput && !this.IsReadOnly )
           {
             this.DoDecrement();
             e.Handled = true;
@@ -194,7 +206,9 @@ namespace Xceed.Wpf.Toolkit.Primitives
     private void TextBox_SelectionChanged( object sender, RoutedEventArgs e )
     {
       if( _fireSelectionChangedEvent )
+      {
         this.PerformMouseSelection();
+      }
       else
         _fireSelectionChangedEvent = true;
     }
@@ -219,19 +233,23 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     protected virtual void PerformMouseSelection()
     {
-      var dateTimeInfo = this.GetDateTimeInfo( TextBox.SelectionStart );
-      if( ( dateTimeInfo != null) && (dateTimeInfo.Type == DateTimePart.Other) )
+      // Due to case 3424 - TimePicker/DateTimePicker : Selecting any time part always increments the first part
+      // Using DispatcherPriority.ApplicationIdle ensures that PerformMouseSelection() runs after any base class has finished handling the mouse click.
+      this.Dispatcher.BeginInvoke( DispatcherPriority.ApplicationIdle, new Action( () =>
       {
-        this.Dispatcher.BeginInvoke( DispatcherPriority.Background, new Action( () =>
-        {
-          // Select the next dateTime part
-          this.Select( this.GetDateTimeInfo( dateTimeInfo.StartPosition + dateTimeInfo.Length ) );
-        }
-        ) );
-        return;
-      }     
+        var dateTimeInfo = this.GetDateTimeInfo( TextBox.SelectionStart );
 
-      this.Select( dateTimeInfo );
+        if( ( dateTimeInfo != null ) && ( dateTimeInfo.Type == DateTimePart.Other ) )
+        {
+          this.Dispatcher.BeginInvoke( DispatcherPriority.Background, new Action( () =>
+          {
+            this.Select( this.GetDateTimeInfo( dateTimeInfo.StartPosition + dateTimeInfo.Length ) );
+          } ) );
+          return;
+        }
+
+        this.Select( dateTimeInfo );
+      } ) );
     }
 
     protected virtual bool IsLowerThan( T value1, T value2 )
@@ -252,12 +270,12 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
     internal DateTimeInfo GetDateTimeInfo( DateTimePart part )
     {
-      return _dateTimeInfoList.FirstOrDefault( ( info ) =>info.Type == part );
+      return _dateTimeInfoList.FirstOrDefault( ( info ) => info.Type == part );
     }
 
     internal virtual void Select( DateTimeInfo info )
     {
-      if( (info != null) && !info.Equals( _selectedDateTimeInfo ) && ( this.TextBox != null) && !string.IsNullOrEmpty( this.TextBox.Text ) )
+      if( ( info != null ) && !info.Equals( _selectedDateTimeInfo ) && ( this.TextBox != null ) && !string.IsNullOrEmpty( this.TextBox.Text ) )
       {
         _fireSelectionChangedEvent = false;
         this.TextBox.Select( info.StartPosition, info.Length );
@@ -321,7 +339,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
       {
         this.Select( this.GetPreviousDateTimeInfo( nextSelectionStart - 1 ) );
       }
-    }    
+    }
 
     private DateTimeInfo GetNextDateTimeInfo( int nextSelectionStart )
     {
@@ -359,7 +377,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
 
       DateTimeInfo initialDateTimeInfo = previousDateTimeInfo;
 
-      while( (previousDateTimeInfo != null) && (previousDateTimeInfo.Type == DateTimePart.Other) )
+      while( ( previousDateTimeInfo != null ) && ( previousDateTimeInfo.Type == DateTimePart.Other ) )
       {
         previousDateTimeInfo = this.GetDateTimeInfo( previousDateTimeInfo.StartPosition - 1 );
         if( previousDateTimeInfo == null )
@@ -376,7 +394,7 @@ namespace Xceed.Wpf.Toolkit.Primitives
     {
       if( _selectedDateTimeInfo == null )
       {
-        this.Select( (this.CurrentDateTimePart != DateTimePart.Other) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : this.GetDateTimeInfo( 0 ) );
+        this.Select( ( this.CurrentDateTimePart != DateTimePart.Other ) ? this.GetDateTimeInfo( this.CurrentDateTimePart ) : this.GetDateTimeInfo( 0 ) );
       }
     }
 
