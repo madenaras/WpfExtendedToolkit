@@ -65,6 +65,9 @@
       <markup:DataGridThemeResourceDictionary Source="/themes/Aero2/TableflowView.Aero2.normalcolor.xaml" />
       <markup:DataGridThemeResourceDictionary Source="/themes/Aero2/TableView.Aero2.normalcolor.xaml" />
 
+      <markup:DataGridThemeResourceDictionary Source="/themes/MaterialDesign/TableflowView.MaterialDesign.normalcolor.xaml" />
+      <markup:DataGridThemeResourceDictionary Source="/themes/MaterialDesign/TableView.MaterialDesign.normalcolor.xaml" />
+
    </ResourceDictionary.MergedDictionaries>
 
    <!-- *******************************************************************************************

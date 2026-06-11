@@ -237,6 +237,7 @@
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
 
       <TextBlock Text="CheckListBox Usage:"
@@ -260,7 +261,7 @@
                  Margin="5,2,5,2"
                  Style="{StaticResource Header}" />
       <xctk:CheckComboBox Grid.Column="1"
-                          x:Name="_checkComboBox"
+                          x:Name="_checkComboBox"                          
                           Grid.Row="1"
                           Margin="5"
                           VerticalAlignment="Top"
@@ -273,7 +274,38 @@
                           SelectAllContent="{Binding ElementName=_selectAllContent, Path=Text}"
                           IsEditable="False"
                           IsDropDownOpen="false"
-                          MaxDropDownHeight="100" />
+                          MaxDropDownHeight="100" >
+        <xctk:CheckComboBox.Resources>
+          <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+              <ResourceDictionary Source="/DotNetProjects.Wpf.Extended.Toolkit;component/CheckComboBox/Themes/Aero2.NormalColor.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+          </ResourceDictionary>
+        </xctk:CheckComboBox.Resources>
+      </xctk:CheckComboBox>
+      <xctk:CheckComboBox Grid.Column="2"
+                          x:Name="_checkComboBox2"                          
+                          Grid.Row="1"
+                          Margin="5"
+                          VerticalAlignment="Top"
+                          ItemsSource="{Binding}"
+                          Delimiter="{Binding ElementName=_delimiter, Path=Text}"
+                          ValueMemberPath="{Binding ElementName=_valueMemberPath, Path=SelectedItem}"
+                          SelectedMemberPath="{Binding ElementName=_selectedMemberPath, Path=Text}"
+                          DisplayMemberPath="{Binding ElementName=_displayMemberPath, Path=SelectedItem}"
+                          IsSelectAllActive="{Binding ElementName=_isSelectAllActive, Path=IsChecked}"
+                          SelectAllContent="{Binding ElementName=_selectAllContent, Path=Text}"
+                          IsEditable="False"
+                          IsDropDownOpen="false"
+                          MaxDropDownHeight="100" >
+        <xctk:CheckComboBox.Resources>
+          <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+              <ResourceDictionary Source="/DotNetProjects.Wpf.Extended.Toolkit;component/CheckComboBox/Themes/Generic.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+          </ResourceDictionary>
+        </xctk:CheckComboBox.Resources>
+      </xctk:CheckComboBox>
     </Grid>
   </Grid>
 </local:DemoView>

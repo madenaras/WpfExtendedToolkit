@@ -106,4 +106,9 @@ namespace Xceed.Wpf.DataGrid.Views
   public class Windows8Theme : Theme
   {
   }
+  [TargetView(typeof(TableflowView))]
+  [TargetView(typeof(TableView))]
+  public class MaterialDesignTheme : Theme
+  {
+  }
 }

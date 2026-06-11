@@ -89,6 +89,10 @@ namespace Xceed.Wpf.DataGrid.Markup
           case "aero2normalcolortheme":
             theme = s_aero2NormalColorTheme;
             break;
+          case "materialdesign.normalcolor":
+          case "materialdesigncolortheme":
+            theme = s_materialDesignTheme;
+            break;
         }
 
         if( theme == null )
@@ -109,5 +113,6 @@ namespace Xceed.Wpf.DataGrid.Markup
     private static readonly Theme s_zuneNormalColorTheme = new ZuneNormalColorTheme();
     private static readonly Theme s_windows7Theme = new Windows7Theme();
     private static readonly Theme s_aero2NormalColorTheme = new Windows8Theme();
+    private static readonly Theme s_materialDesignTheme = new MaterialDesignTheme();
   }
 }
