@@ -465,7 +465,7 @@
         </MultiTrigger.Conditions>
         <Setter TargetName="rootBorder"
            Property="Background"
-           Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+           Value="{DynamicResource MaterialDesign.Brush.DataGrid.RowHoverBackground}" />
       </MultiTrigger>
 
       <!-- The following 2 triggers allow the appropriate Sort Glyph to be displayed
@@ -1312,7 +1312,7 @@
          </DataTrigger>
 
          <!-- Enabled/Disabled Odd datarow style alternation -->
-         <MultiDataTrigger>
+         <!--<MultiDataTrigger>
             <MultiDataTrigger.Conditions>
                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(local:DataGridControl.DataGridContext).IsAlternatingRowStyleEnabled}"
                           Value="True" />
@@ -1323,7 +1323,7 @@
             <Setter Property="Background"
                     Value="#EDEDED" />
 
-         </MultiDataTrigger>
+         </MultiDataTrigger>-->
       </Style.Triggers>
 
    </Style>
@@ -1384,10 +1384,16 @@
       <Setter Property="Foreground"
               Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
 
-      <Setter Property="local:RowSelector.Visible"
+    <Setter Property="BorderBrush"
+              Value="Black" />
+
+    <Setter Property="BorderThickness"
+              Value="0,1,0,1" />
+
+    <Setter Property="local:RowSelector.Visible"
               Value="False" />
 
-      <Setter Property="Template"
+    <Setter Property="Template"
               Value="{StaticResource tableflowViewColumnManagerRowTemplate}" />
 
       <Style.Triggers>

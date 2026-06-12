@@ -60,7 +60,7 @@ namespace Xceed.Wpf.Toolkit.Zoombox
       : base()
     {
 
-      Core.Message.ShowMessage();
+      
 
       try
       {

@@ -668,7 +668,7 @@ namespace Xceed.Wpf.Toolkit
     public ColorPicker()
     {
 
-      Core.Message.ShowMessage();
+      
 
 #if VS2008
         this.RecentColors = new ObservableCollection<ColorItem>();

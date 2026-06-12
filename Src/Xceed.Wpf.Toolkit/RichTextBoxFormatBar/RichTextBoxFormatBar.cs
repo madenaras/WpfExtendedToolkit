@@ -74,7 +74,7 @@ namespace Xceed.Wpf.Toolkit
     public RichTextBoxFormatBar()
     {
 
-      Core.Message.ShowMessage();
+      
     }
 
     #endregion //Constructors

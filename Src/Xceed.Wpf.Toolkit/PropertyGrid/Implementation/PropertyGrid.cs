@@ -915,7 +915,7 @@ namespace Xceed.Wpf.Toolkit.PropertyGrid
     public PropertyGrid()
     {
 
-      Core.Message.ShowMessage();
+      
 
       _propertyDefinitionsListener = new WeakEventListener<NotifyCollectionChangedEventArgs>( this.OnPropertyDefinitionsCollectionChanged );
       _editorDefinitionsListener = new WeakEventListener<NotifyCollectionChangedEventArgs>( this.OnEditorDefinitionsCollectionChanged );

@@ -335,7 +335,7 @@ namespace Xceed.Wpf.Toolkit
     public Wizard()
     {
 
-      Core.Message.ShowMessage();
+      
 
       CommandBindings.Add( new CommandBinding( WizardCommands.Cancel, ExecuteCancelWizard, CanExecuteCancelWizard ) );
       CommandBindings.Add( new CommandBinding( WizardCommands.Finish, ExecuteFinishWizard, CanExecuteFinishWizard ) );

@@ -52,7 +52,7 @@ namespace Xceed.Wpf.Toolkit
     public BusyIndicator()
     {
 
-      Core.Message.ShowMessage();
+      
       _displayAfterTimer.Tick += DisplayAfterTimerElapsed;
     }
 

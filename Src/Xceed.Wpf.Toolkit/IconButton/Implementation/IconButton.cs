@@ -32,7 +32,7 @@ namespace Xceed.Wpf.Toolkit
     public IconButton()
     {
 
-      Core.Message.ShowMessage();
+      
     }
 
     #endregion //Constructors

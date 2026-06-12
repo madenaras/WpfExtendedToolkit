@@ -336,7 +336,7 @@ namespace Xceed.Wpf.Toolkit
     public ButtonSpinner()
     {
 
-      Core.Message.ShowMessage();
+      
     }
 
     #endregion //Constructors

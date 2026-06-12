@@ -85,7 +85,7 @@ namespace Xceed.Wpf.Toolkit
 
     public MessageBox()
     {
-      Core.Message.ShowMessage();
+      
 
       this.Visibility = Visibility.Collapsed;
       this.InitHandlers();

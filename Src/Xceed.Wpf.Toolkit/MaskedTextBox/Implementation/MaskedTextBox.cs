@@ -170,7 +170,7 @@ namespace Xceed.Wpf.Toolkit
     public MaskedTextBox()
     {
 
-      Core.Message.ShowMessage();
+      
 
       CommandManager.AddPreviewCanExecuteHandler( this, new CanExecuteRoutedEventHandler( this.OnPreviewCanExecuteCommands ) );
       CommandManager.AddPreviewExecutedHandler( this, new ExecutedRoutedEventHandler( this.OnPreviewExecutedCommands ) );

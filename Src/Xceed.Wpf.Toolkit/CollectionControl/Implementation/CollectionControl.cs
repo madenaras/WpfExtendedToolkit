@@ -303,7 +303,7 @@ namespace Xceed.Wpf.Toolkit
 
     public CollectionControl()
     {
-      Core.Message.ShowMessage();
+      
 
       Items = new ObservableCollection<object>();
       CommandBindings.Add( new CommandBinding( ApplicationCommands.New, this.AddNew, this.CanAddNew ) );

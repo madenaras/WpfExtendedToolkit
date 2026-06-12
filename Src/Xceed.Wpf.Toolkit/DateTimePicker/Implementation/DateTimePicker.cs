@@ -286,7 +286,7 @@ namespace Xceed.Wpf.Toolkit
     public DateTimePicker()
     {
 
-      Core.Message.ShowMessage();
+      
     }
 
     #endregion //Constructors

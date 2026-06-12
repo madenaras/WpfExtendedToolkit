@@ -52,7 +52,7 @@ namespace Xceed.Wpf.Toolkit
     public CheckComboBox()
     {
 
-      Core.Message.ShowMessage();
+      
 
       Keyboard.AddKeyDownHandler( this, OnKeyDown );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );

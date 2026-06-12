@@ -544,7 +544,7 @@ UpDownBase<T> ), new UIPropertyMetadata( true ) );
     internal UpDownBase()
     {
 
-      Core.Message.ShowMessage();
+      
 
       this.AddHandler( Mouse.PreviewMouseDownOutsideCapturedElementEvent, new RoutedEventHandler( this.HandleClickOutsideOfControlWithMouseCapture ),
 

@@ -322,7 +322,7 @@ namespace Xceed.Wpf.Toolkit
 
     public ChildWindow()
     {
-      Core.Message.ShowMessage();
+      
 
       DesignerWindowState = Xceed.Wpf.Toolkit.WindowState.Open;
 

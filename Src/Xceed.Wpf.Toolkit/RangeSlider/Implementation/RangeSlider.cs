@@ -59,7 +59,7 @@ namespace Xceed.Wpf.Toolkit
     public RangeSlider()
     {
 
-      Core.Message.ShowMessage();
+      
 
       this.SizeChanged += this.RangeSlider_SizeChanged;
     }

@@ -39,7 +39,7 @@ namespace Xceed.Wpf.Toolkit
       : base( document )
     {
 
-      Core.Message.ShowMessage();
+      
     }
 
     #endregion //Constructors

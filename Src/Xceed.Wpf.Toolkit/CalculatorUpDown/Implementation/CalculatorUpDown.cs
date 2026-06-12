@@ -216,7 +216,7 @@ namespace Xceed.Wpf.Toolkit
 
     public CalculatorUpDown()
     {
-      Core.Message.ShowMessage();
+      
 
       Keyboard.AddKeyDownHandler( this, OnKeyDown );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );

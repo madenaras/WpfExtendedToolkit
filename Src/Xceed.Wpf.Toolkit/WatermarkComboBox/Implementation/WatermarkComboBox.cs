@@ -89,7 +89,7 @@ namespace Xceed.Wpf.Toolkit
     public WatermarkComboBox()
     {
 
-      Core.Message.ShowMessage();
+      
     }
 
     #endregion //Constructors

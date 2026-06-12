@@ -218,7 +218,7 @@ namespace Xceed.Wpf.Toolkit
 
     public DateTimeUpDown()
     {
-      Core.Message.ShowMessage();
+      
 
       this.Loaded += this.DateTimeUpDown_Loaded;
     }

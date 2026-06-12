@@ -56,7 +56,7 @@ namespace Xceed.Wpf.Toolkit
     public DropDownButton()
     {
 
-      Core.Message.ShowMessage();
+      
       Keyboard.AddKeyDownHandler( this, OnKeyDown );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );
     }
