@@ -1198,10 +1198,10 @@
               Value="Center" />
 
       <Setter Property="VerticalContentAlignment"
-              Value="Top" />
+              Value="Center" />
 
       <Setter Property="Padding"
-              Value="2" />
+              Value="1" />
 
       <Setter Property="Template"
               Value="{StaticResource tableflowViewRowSelectorTemplate}" />
@@ -1243,7 +1243,7 @@
          <Trigger Property="IsMouseOver"
                   Value="True">
             <Setter Property="Background"
-                    Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+                    Value="{DynamicResource MaterialDesign.Brush.Primary}" />
          </Trigger>
          <Trigger Property="IsPressed"
                   Value="True">
@@ -1350,7 +1350,7 @@
                           Value="False" />
             </MultiDataTrigger.Conditions>
             <Setter Property="Background"
-                    Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+                    Value="{DynamicResource MaterialDesign.Brush.DataGrid.RowHoverBackground}" />
          </MultiDataTrigger>
 
          <!-- MouseOver + Selected -->
@@ -1364,7 +1364,7 @@
                           Value="True" />
             </MultiDataTrigger.Conditions>
             <Setter Property="SelectionBackground"
-                    Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+                    Value="{DynamicResource MaterialDesign.Brush.DataGrid.RowHoverBackground}" />
          </MultiDataTrigger>
       </Style.Triggers>
 
@@ -1385,10 +1385,16 @@
               Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
 
     <Setter Property="BorderBrush"
-              Value="Black" />
+              Value="{DynamicResource MaterialDesign.Brush.Primary.Dark}" />
 
+    <Setter Property="Padding"
+              Value="4,4,4,4" />
+    <Setter Property="Height"
+              Value="30" />
+    <Setter Property="FontWeight"
+              Value="Medium" />
     <Setter Property="BorderThickness"
-              Value="0,1,0,1" />
+              Value="0,0,0,1" />
 
     <Setter Property="local:RowSelector.Visible"
               Value="False" />

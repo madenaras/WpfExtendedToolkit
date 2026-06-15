@@ -1032,7 +1032,13 @@ namespace Xceed.Wpf.DataGrid.Views
             this.RecycleContainer( generator, index, container, clearContainer );
           }
 
-          m_layoutedContainers.RemoveAt( i );
+          // generator.Remove() inside RecycleContainer may trigger side effects that modify
+          // m_layoutedContainers. Only remove if the index is still valid and the entry
+          // still refers to the same container (i.e. no earlier element was already removed).
+          if( i < m_layoutedContainers.Count && m_layoutedContainers[ i ].Container == container )
+          {
+            m_layoutedContainers.RemoveAt( i );
+          }
         }
       }
 
