@@ -1100,7 +1100,14 @@ namespace Xceed.Wpf.DataGrid.Views
         var index = generator.GetRealizedIndexForContainer( container );
 
         this.RecycleContainer( generator, index, container );
-        stickyContainers.RemoveAt( i );
+        // generator.Remove() inside RecycleContainer may trigger side effects that modify
+        // m_layoutedContainers. Only remove if the index is still valid and the entry
+        // still refers to the same container (i.e. no earlier element was already removed).
+        if (i < stickyContainers.Count && stickyContainers[i].Container == container)
+        {
+          stickyContainers.RemoveAt(i);
+        }
+        //stickyContainers.RemoveAt( i );
       }
     }
 
