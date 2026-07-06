@@ -1421,7 +1421,7 @@
           TargetType="local:Cell">
 
       <Setter Property="CurrentBackground"
-              Value="{DynamicResource MaterialDesign.Brush.DataGrid.Selected}" />
+              Value="Transparent" />
 
       <Setter Property="CurrentForeground"
               Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
